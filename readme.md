@@ -1,6 +1,6 @@
 # node-bitbuffer
 
-A bit field, backed by node.js Buffer
+A bit array, backed by node.js Buffer
 
 ## Install
 
