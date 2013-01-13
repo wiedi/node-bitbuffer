@@ -1,0 +1,7 @@
+{
+	"name":        "bitbuffer",
+	"version":     "0.1.0",
+	"author":      "Sebastian Wiedenroth <wiedi@frubar.net>",
+	"description": "bit field, backed by node.js Buffer",
+	"main":        "bitbuffer.js"
+}
