@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 function BitBuffer(number) {
 	this.buffer = new Buffer(Math.ceil(number / 8))
