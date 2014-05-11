@@ -7,7 +7,7 @@ function BitBuffer(number) {
 
 BitBuffer.prototype = {
 	set: function(index, bool) {
-	var pos = index >>> 3
+		var pos = index >>> 3
 		if(bool) {
 			this.buffer[pos] |= 1 << (index % 8)
 		} else {
