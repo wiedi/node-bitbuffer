@@ -9,5 +9,11 @@
 			"name": "MIT",
 			"url": "http://www.opensource.org/licenses/mit-license.php"
 		}
-	]
+	],
+	 "devDependencies": {
+		"mocha": "1.18.x"
+	},
+	"scripts": {
+		"test": "mocha -u qunit -R list"
+	}
 }
