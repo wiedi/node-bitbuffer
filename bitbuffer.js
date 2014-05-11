@@ -7,17 +7,18 @@ function BitBuffer(number) {
 
 BitBuffer.prototype = {
 	set: function(index, bool) {
+    var pos = index >>> 3
 		if(bool) {
-			this.buffer[index >> 3] |= 1 << (index % 8)
+			this.buffer[pos] |= 1 << (index % 8)
 		} else {
-			this.buffer[index >> 3] &= ~(1 << (index % 8))
+			this.buffer[pos] &= ~(1 << (index % 8))
 		}
 	},
 	get: function(index) {
-		return (this.buffer[index >> 3] & (1 << (index % 8))) != 0
+		return (this.buffer[index >>> 3] & (1 << (index % 8))) != 0
 	},
 	toggle: function(index) {
-		this.buffer[index >> 3] ^= 1 << (index % 8)
+		this.buffer[index >>> 3] ^= 1 << (index % 8)
 	},
 	toBuffer: function() {
 		return this.buffer
