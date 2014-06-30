@@ -1,9 +1,15 @@
 "use strict"
 
-function BitBuffer(number) {
-	this.buffer = new Buffer(Math.ceil(number / 8))
-	this.buffer.fill(0)
+function BitBuffer(number,buffer) {
+  var size = Math.ceil(number/8)
+  if (buffer != undefined && buffer.length == size) {
+    this.buffer = buffer
+  } else {
+	  this.buffer = new Buffer(size)
+	  this.buffer.fill(0)
+  } 
 }
+
 
 BitBuffer.prototype = {
 	set: function(index, bool) {
