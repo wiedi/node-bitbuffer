@@ -1,10 +1,11 @@
 "use strict"
 
 function BitBuffer(number,buffer) {
-  if (buffer != undefined && buffer.length == number/8) {
-    this.buffer = buffer;
+  var size = Math.ceil(number/8)
+  if (buffer != undefined && buffer.length == size) {
+    this.buffer = buffer
   } else {
-	  this.buffer = new Buffer(Math.ceil(number / 8))
+	  this.buffer = new Buffer(size)
 	  this.buffer.fill(0)
   } 
 }
