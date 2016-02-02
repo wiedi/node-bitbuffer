@@ -42,6 +42,22 @@ BitBuffer.prototype = {
   toBuffer: function() {
 		return this.buffer
 	},
+  
+  fromBitArray: function(bitarr, resize) {
+    var
+      bitSize = bitarr.length,
+      byteSize = Math.ceil(bitSize / 8);
+    
+    if (resize && byteSize != this.buffer.length) {
+      this.resize(bitSize);
+    }
+    
+    bitarr.forEach(function(bit, bit_i){
+      this.set(bit_i, bit)
+    }, this);
+    
+    return this;
+  },
   toBitArray: function(bitOrder) {
     var
       size = this.size,
@@ -60,6 +76,19 @@ BitBuffer.prototype = {
     }
     
     return boolarr;
+  },
+  
+  fromBinaryString: function(bitstr, resize) {
+    //treat the string as an array of bits that has been indexed backwards
+    var
+      bitSize = bitstr.length,
+      bitarr = [];
+    
+    while (--bitSize) {
+      bitarr.push(!!+bitstr[bitSize]);
+    }
+    
+    return this.fromBitArray(bitarr, resize);
   },
   toBinaryString: function() {
     return this.toBitArray(-1).join("");
