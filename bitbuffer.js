@@ -101,7 +101,7 @@ BitBuffer.prototype = {
       newbuff;
       
     if (!isFinite(newSize) || oldSize == newSize) {
-      return;
+      return this;
     }
     
     newbuff = (new Buffer(newSize)).fill(0);
