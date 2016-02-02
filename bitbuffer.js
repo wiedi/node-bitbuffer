@@ -38,9 +38,32 @@ BitBuffer.prototype = {
 	toggle: function(index) {
 		this.buffer[this._byteIndex(index)] ^= 1 << (index % 8);
 	},
-	toBuffer: function() {
+	
+  toBuffer: function() {
 		return this.buffer
 	},
+  toBitArray: function(bitOrder) {
+    var
+      size = this.size,
+      maxBit = size - 1,
+      boolarr = [];
+    
+    if (bitOrder < 0) {
+      //bitOrder can be set to a negative number to reverse the bit array
+      for (var bit_i = 0; bit_i < size; bit_i++) {
+        boolarr[maxBit - bit_i] = +!!this.get(bit_i);
+      }
+    } else {
+      for (var bit_i = 0; bit_i < size; bit_i++) {
+        boolarr[bit_i] = +!!this.get(bit_i);
+      }
+    }
+    
+    return boolarr;
+  },
+  toBinaryString: function() {
+    return this.toBitArray(-1).join("");
+  },
   
   _byteIndex: null,
   _byteIndexLE: function(index) {
