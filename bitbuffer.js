@@ -65,6 +65,38 @@ BitBuffer.prototype = {
     return this.toBitArray(-1).join("");
   },
   
+  resize: function(bitSize) {
+    var
+      oldSize = this.buffer.length,
+      newSize = Math.ceil(bitSize / 8),
+      newbuff;
+      
+    if (!isFinite(newSize) || oldSize == newSize) {
+      return;
+    }
+    
+    newbuff = (new Buffer(newSize)).fill(0);
+    
+    if (newSize > oldSize) {
+      //if this is an LE system, we need to make sure the start byte is offset
+      //so the extra size will come in on the left side
+      this.buffer.copy(
+        newbuff, (os.endianness() == "LE" ? newSize - oldSize : 0), 0, oldSize
+      );
+    } else {
+      //if this is an LE system, we need to make sure the start byte is offset
+      //so the bit field will be trucated on the left
+      this.buffer.copy(
+        newbuff, 0, (os.endianness() == "LE" ? oldSize - newSize : 0), oldSize
+      );
+    }
+    
+    this.buffer = newbuff;
+    this.maxByteIndex = newbuff.length - 1;
+    this.size = newbuff.length * 8;
+    
+    return this;
+  },
   _byteIndex: null,
   _byteIndexLE: function(index) {
     return this.maxByteIndex - (index >>> 3);
