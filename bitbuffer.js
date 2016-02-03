@@ -139,6 +139,9 @@ BitBuffer.prototype = {
     
     return this;
   },
+  subbuffer: function(begin, end) {
+    return (new BitBuffer()).fromBitArray(this.toBitArray().slice(begin, end));
+  },
   _byteIndex: null,
   _byteIndexLE: function(index) {
     return this.maxByteIndex - (index >>> 3);
