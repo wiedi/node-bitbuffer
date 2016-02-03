@@ -52,7 +52,8 @@ BitBuffer.prototype = {
     if (noresize || byteSize == this.buffer.length) {
       this.buffer.fill(0);
     } else {
-      this.buffer = new Buffer(byteSize).fill(0);
+      this.buffer = new Buffer(byteSize)
+      this.buffer.fill(0);
       this.maxByteIndex = byteSize - 1;
       this.size = this.buffer.length * 8;
     }
@@ -109,7 +110,8 @@ BitBuffer.prototype = {
       return this;
     }
     
-    newbuff = (new Buffer(newSize)).fill(0);
+    newbuff = new Buffer(newSize);
+    newbuff.fill(0);
     
     if (newSize > oldSize) {
       //if this is an LE system, we need to make sure the start byte is offset
