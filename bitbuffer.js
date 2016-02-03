@@ -89,7 +89,7 @@ BitBuffer.prototype = {
       bitSize = bitstr.length,
       bitarr = [];
     
-    while (--bitSize) {
+    while (bitSize--) {
       bitarr.push(!!+bitstr[bitSize]);
     }
     
