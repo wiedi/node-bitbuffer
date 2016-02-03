@@ -110,27 +110,32 @@ BitBuffer.prototype = {
       return this;
     }
     
-    newbuff = new Buffer(newSize);
-    newbuff.fill(0);
-    
     if (newSize > oldSize) {
+      newbuff = new Buffer(newSize);
+      newbuff.fill(0);
+      
       //if this is an LE system, we need to make sure the start byte is offset
       //so the extra size will come in on the left side
       this.buffer.copy(
         newbuff, (os.endianness() == "LE" ? newSize - oldSize : 0), 0, oldSize
       );
+      this.buffer = newbuff;
+    
     } else {
-      //if this is an LE system, we need to make sure the start byte is offset
-      //so the bit field will be trucated on the left
-      this.buffer.copy(
-        newbuff, 0, (os.endianness() == "LE" ? oldSize - newSize : 0), oldSize
-      );
+      //We are shirinking the buffer, instead of creating a new buffer 
+      //and copying, we can just take the slice of the data we need.
+      if (os.endianness() == "LE") {
+        //If this is an LE system we want the higher indexed bytes
+        this.buffer = this.buffer.slice((oldSize - newSize), oldSize);
+      } else {
+        this.buffer = this.buffer.slice(0, newSize);
+      }
     }
-    
-    this.buffer = newbuff;
-    this.maxByteIndex = newbuff.length - 1;
+
+    //update the size properties
+    this.maxByteIndex = this.buffer.length - 1;
     this.size = bitSize;
-    
+
     if (bitSize % 8 != 0) {
       //zero out any bits beyond the specified size in the last byte
       lastByte = this._byteIndex(bitSize);
