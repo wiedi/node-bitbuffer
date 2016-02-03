@@ -142,6 +142,43 @@ BitBuffer.prototype = {
   subbuffer: function(begin, end) {
     return (new BitBuffer()).fromBitArray(this.toBitArray().slice(begin, end));
   },
+  shiftRight: function(shiftBits) {
+    if (shiftBits < 0) {
+      return this.shiftLeft(-shiftBits);
+    }
+    
+    var bitarr = this.toBitArray();
+    
+    while (shiftBits--) {
+      //shift the bits off the "front" of the array
+      //array index 0 is at the front, which corresponds to 
+      //LSB on the right of the bit string
+      bitarr.shift();
+      bitarr.push(0);
+    }
+    
+    this.fromBitArray(bitarr);
+    
+    return this;
+  },
+  shiftLeft: function(shiftBits) {
+    if (shiftBits < 0) {
+      return this.shiftRight(-shiftBits);
+    }
+    
+    var bitarr = this.toBitArray();
+    
+    while (shiftBits--) {
+      //unshift empty bits onto the front of the array
+      //and pop the extra bit off the end
+      bitarr.unshift(0);
+      bitarr.pop();
+    }
+    
+    this.fromBitArray(bitarr);
+    
+    return this;
+  },
   _byteIndex: null,
   _byteIndexLE: function(index) {
     return this.maxByteIndex - (index >>> 3);
