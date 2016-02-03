@@ -99,6 +99,49 @@ BitBuffer.prototype = {
   toBinaryString: function() {
     return this.toBitArray(-1).join("");
   },
+ 
+  fromHexString: function(hexstr, noresize) {
+    //treat the string as an array of bits that has been indexed backwards
+    var
+      nybbleSize = hexstr.length,
+      byteSize = Math.ceil(nybbleSize / 2),
+      bitSize = nybbleSize << 2;
+    
+    if (nybbleSize < 1) {
+      return this.resize(0);
+    }
+    
+    //clear out the buffer
+    if (noresize || byteSize == this.buffer.length) {
+      this.buffer.fill(0);
+    } else {
+      this.buffer = new Buffer(byteSize);
+      this.buffer.fill(0);
+      this.maxByteIndex = byteSize - 1;
+      this.size = bitSize;
+    }
+    
+    //pad the hex string if it does not contain an integer number of bytes
+    if (nybbleSize % 2 != 0) {
+      hexstr = "0" + hexstr;
+      nybbleSize++;
+      bitSize += 4;
+    }
+    
+    for (var bit_i=bitSize-1, nyb_i=0; nyb_i < nybbleSize; bit_i-=8, nyb_i+=2) {
+      this.buffer[this._byteIndex(bit_i)]=+("0x"+hexstr[nyb_i]+hexstr[nyb_i+1]);
+    }
+    
+    return this;
+  },
+  toHexString: function() {
+    var hexstr = this.buffer.toString("hex");
+    
+    //the string will be in whole bytes.
+    //However, if our bit buffer size is not in whole bytes,
+    //we should chop off any leading nybbles before returning
+    return hexstr.substring(hexstr.length - ((this.size / 4) >> 0));
+  },
   
   resize: function(bitSize) {
     var
