@@ -1,8 +1,21 @@
 "use strict"
 var assert = require("assert")
 var BitBuffer = require('./bitbuffer').BitBuffer
+var endianness = require('os').endianness();
 
-suite('BitBuffer')
+if (!test) {
+  var test = (
+    function test(name, testfun) {
+      try {
+        testfun();
+        console.log(name + ": PASSED");
+      } catch (e) {
+        console.error(name + ": Failed");
+        console.error(e);
+      }
+    }
+  );
+}
 
 test('#zeroinit', function() {
 	var b = new BitBuffer(10)
@@ -23,11 +36,16 @@ test('#set', function() {
 
 function big(bit) {
 	var b = new BitBuffer(bit + 1)
-	assert.equal(b.get(bit), false)
+  assert.equal(b.get(bit), false)
 	b.set(bit, true)
 	assert.equal(b.get(bit), true)
+  
+  var byte_i = (bit / 8)|0;
+  if (endianness == "LE") {
+    byte_i = b.buffer.length - byte_i - 1;
+  }
 	assert.equal(
-		(b.buffer[(bit / 8)|0] & (1 << (bit % 8))) != 0,
+		(b.buffer[byte_i] & (1 << (bit % 8))) != 0,
 		true
 	)
 }
@@ -47,9 +65,8 @@ test('#bigone_4g', function() {
 test('#bigone_8g', function() {
 	assert.throws(
 		function() {
-			b = new BitBuffer(Math.pow(2,33))
+      var b = new BitBuffer(Math.pow(2,33));
 		},
 		RangeError
 	)
 })
-
