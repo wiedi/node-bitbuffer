@@ -88,13 +88,28 @@ BitBuffer.prototype = {
     //treat the string as an array of bits that has been indexed backwards
     var
       bitSize = bitstr.length,
-      bitarr = [];
+      byteSize = Math.ceil(bitSize / 8),
+      bit_i = 0;
     
+    if (bitSize < 1) {
+      return this.resize(0);
+    }
+
+    //clear out the buffer
+    if (noresize || byteSize == this.buffer.length) {
+      this.buffer.fill(0);
+    } else {
+      this.buffer = new Buffer(byteSize)
+      this.buffer.fill(0);
+      this.maxByteIndex = byteSize - 1;
+      this.size = bitSize;
+    }
+
     while (bitSize--) {
-      bitarr.push(!!+bitstr[bitSize]);
+      this.set(bit_i++, !!+bitstr[bitSize]);
     }
     
-    return this.fromBitArray(bitarr, noresize);
+    return this;
   },
   toBinaryString: function() {
     return this.toBitArray(-1).join("");
