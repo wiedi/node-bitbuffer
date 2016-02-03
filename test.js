@@ -176,3 +176,8 @@ test('#subbuffer-middle', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
   assert.equal(b.subbuffer(5, 12).toBinaryString(), "1000111");
 })
+
+test('#subbuffer-invalid', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  assert.equal(b.subbuffer(12, 5).toBinaryString(), "");
+})
