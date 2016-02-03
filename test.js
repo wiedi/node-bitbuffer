@@ -70,3 +70,58 @@ test('#bigone_8g', function() {
 		RangeError
 	)
 })
+
+test('#fromBitArray', function() {
+  var bitarr = [0,0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,1];
+  var b = (new BitBuffer()).fromBitArray(bitarr);
+  bitarr.forEach(function(bit, bit_i) {
+    assert.equal(!!bit, !!b.get(bit_i))
+  }, this)
+})
+
+test('#fromBitArray-toBitArray', function() {
+  var inbitarr = [0,0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,1];
+  var b = (new BitBuffer()).fromBitArray(inbitarr);
+  var outbitarr = b.toBitArray();
+  inbitarr.forEach(function(bit, bit_i) {
+    assert.equal(!!bit, !!outbitarr[bit_i])
+  }, this);
+})
+
+test('#fromBinaryString', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  assert.equal(b.buffer[endianness == "LE" ? 2 : 0], 0xf0);
+  assert.equal(b.buffer[1], 0x38);
+  assert.equal(b.buffer[endianness == "LE" ? 0 : 2], 0x0b);
+})
+
+test('#fromBinaryString-toBinaryString', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  assert.equal(b.toBinaryString(), "10110011100011110000");
+})
+
+test('#fromHexString', function() {
+  var b = (new BitBuffer()).fromHexString("b38f0");
+  assert.equal(b.buffer[endianness == "LE" ? 2 : 0], 0xf0);
+  assert.equal(b.buffer[1], 0x38);
+  assert.equal(b.buffer[endianness == "LE" ? 0 : 2], 0x0b);
+})
+
+test('#fromHexString-toHexString', function() {
+  var b = (new BitBuffer()).fromHexString("b38f0");
+  assert.equal(b.toBinaryString(), "10110011100011110000");
+})
+
+test('#fromHexString-toBinaryString-toBitArray-toHexString', function() {
+  var inhexstr = "b38f0";
+  var b = (new BitBuffer());
+  var outhexstr = 
+    b.fromBitArray(
+      b.fromBinaryString(
+        b.fromHexString(
+          inhexstr
+        ).toBinaryString()
+      ).toBitArray()
+    ).toHexString();
+  assert.equal(inhexstr, outhexstr);
+})
