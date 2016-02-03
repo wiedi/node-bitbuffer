@@ -3,19 +3,21 @@ var assert = require("assert")
 var BitBuffer = require('./bitbuffer').BitBuffer
 var endianness = require('os').endianness();
 
-if (!test) {
-  var test = (
-    function test(name, testfun) {
-      try {
-        testfun();
-        console.log(name + ": PASSED");
-      } catch (e) {
-        console.error(name + ": Failed");
-        console.error(e);
-      }
+var suite = suite || (function(){})
+
+var test = test || (
+  function test(name, testfun) {
+    try {
+      testfun();
+      console.log(name + ": PASSED");
+    } catch (e) {
+      console.error(name + ": Failed");
+      console.error(e);
     }
-  );
-}
+  }
+);
+
+suite('BitBuffer')
 
 test('#zeroinit', function() {
 	var b = new BitBuffer(10)
