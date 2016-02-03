@@ -188,7 +188,23 @@ BitBuffer.prototype = {
     return this;
   },
   subbuffer: function(begin, end) {
-    return (new BitBuffer()).fromBitArray(this.toBitArray().slice(begin, end));
+    var newbuff, size; 
+    
+    //make sure begin and end are valid
+    begin = isFinite(+begin) ? begin : 0,
+    end = isFinite(+end) ? +end : this.size;
+    begin = begin >= 0 ? begin : 0;
+    end = end <= this.size ? end : this.size;
+    size = end - begin;
+    if (size < 1) {
+      return new BitBuffer(0);
+    }
+    
+    newbuff = new BitBuffer(size);
+    for (var bit_i = 0; bit_i < size; bit_i++) {
+      newbuff.set(bit_i, this.get(bit_i + begin));
+    }
+    return newbuff;
   },
   shiftRight: function(shiftBits) {
     if (shiftBits < 0) {
