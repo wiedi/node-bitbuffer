@@ -129,7 +129,7 @@ BitBuffer.prototype = {
     
     this.buffer = newbuff;
     this.maxByteIndex = newbuff.length - 1;
-    this.size = newSize;
+    this.size = bitSize;
     
     if (bitSize % 8 != 0) {
       //zero out any bits beyond the specified size in the last byte
