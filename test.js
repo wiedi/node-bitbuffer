@@ -127,3 +127,52 @@ test('#fromHexString-toBinaryString-toBitArray-toHexString', function() {
     ).toHexString();
   assert.equal(inhexstr, outhexstr);
 })
+
+test('#resize-shrink', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000").resize(8);
+  
+  assert.equal(b.size, 8);
+  assert.equal(b.toBinaryString(), "11110000");
+})
+
+test('#resize-grow', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000").resize(24);
+  
+  assert.equal(b.size, 24);
+  assert.equal(b.toBinaryString(), "000010110011100011110000");
+})
+
+test('#resize-zero', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000").resize(0);
+  
+  assert.equal(b.size, 0);
+  assert.equal(b.toBinaryString(), "");
+})
+
+test('#shiftLeft', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  var size = b.size;
+  b.shiftLeft(5);
+  
+  assert.equal(b.size, size);
+  assert.equal(b.toBinaryString(), "01110001111000000000");
+})
+
+test('#shiftRight', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  var size = b.size;
+  b.shiftRight(5);
+  
+  assert.equal(b.size, size);
+  assert.equal(b.toBinaryString(), "00000101100111000111");
+})
+
+test('#subbuffer-full', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  assert.equal(b.subbuffer().toBinaryString(), "10110011100011110000");
+})
+
+test('#subbuffer-middle', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  assert.equal(b.subbuffer(5, 12).toBinaryString(), "1000111");
+})
