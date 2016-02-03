@@ -47,9 +47,14 @@ BitBuffer.prototype = {
     var
       bitSize = bitarr.length,
       byteSize = Math.ceil(bitSize / 8);
-    
-    if (!noresize && byteSize != this.buffer.length) {
-      this.resize(bitSize);
+
+    //clear out the buffer
+    if (noresize || byteSize == this.buffer.length) {
+      this.buffer.fill(0);
+    } else {
+      this.buffer = new Buffer(byteSize).fill(0);
+      this.maxByteIndex = byteSize - 1;
+      this.size = this.buffer.length * 8;
     }
     
     bitarr.forEach(function(bit, bit_i){
