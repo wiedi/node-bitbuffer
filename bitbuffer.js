@@ -98,9 +98,9 @@ BitBuffer.prototype = {
     var
       oldSize = this.buffer.length,
       newSize = Math.ceil(bitSize / 8),
-      newbuff;
+      newbuff, lastByte;
       
-    if (!isFinite(newSize) || oldSize == newSize) {
+    if (!isFinite(newSize)) {
       return this;
     }
     
@@ -123,6 +123,12 @@ BitBuffer.prototype = {
     this.buffer = newbuff;
     this.maxByteIndex = newbuff.length - 1;
     this.size = newbuff.length * 8;
+    
+    if (bitSize % 8 != 0) {
+      //zero out any bits beyond the specified size in the last byte
+      lastByte = this._byteIndex(bitSize);
+      newbuff[lastByte] = newbuff[lastByte] & (Math.pow(2, bitSize)-1);
+    }
     
     return this;
   },
