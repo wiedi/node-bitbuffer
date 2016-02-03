@@ -11,7 +11,7 @@ function BitBuffer(number, buffer) {
 		this.buffer.fill(0)
 	}
   this.maxByteIndex = this.buffer.length - 1;
-  this.size = this.buffer.length * 8;
+  this.size = number;
   
   /*
     If this is a little endian system, byte 0 would be on the left hand side
@@ -55,7 +55,7 @@ BitBuffer.prototype = {
       this.buffer = new Buffer(byteSize)
       this.buffer.fill(0);
       this.maxByteIndex = byteSize - 1;
-      this.size = this.buffer.length * 8;
+      this.size = bitSize;
     }
     
     bitarr.forEach(function(bit, bit_i){
@@ -129,7 +129,7 @@ BitBuffer.prototype = {
     
     this.buffer = newbuff;
     this.maxByteIndex = newbuff.length - 1;
-    this.size = newbuff.length * 8;
+    this.size = newSize;
     
     if (bitSize % 8 != 0) {
       //zero out any bits beyond the specified size in the last byte
