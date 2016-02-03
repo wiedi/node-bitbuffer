@@ -33,8 +33,6 @@ function big(bit) {
 }
 
 test('#bigone_2852448540', function() {
-	var bit = 2852448540
-	var bit = Math.pow(2,31)
 	big(2852448540)
 })
 
