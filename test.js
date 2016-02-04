@@ -1,7 +1,6 @@
 "use strict"
 var assert = require("assert")
 var BitBuffer = require('./bitbuffer').BitBuffer
-var endianness = require('os').endianness();
 
 var suite = suite || (function(){})
 
@@ -43,9 +42,7 @@ function big(bit) {
 	assert.equal(b.get(bit), true)
   
   var byte_i = (bit / 8)|0;
-  if (endianness == "LE") {
-    byte_i = b.buffer.length - byte_i - 1;
-  }
+  
 	assert.equal(
 		(b.buffer[byte_i] & (1 << (bit % 8))) != 0,
 		true
@@ -83,9 +80,9 @@ test('#fromBitArray-toBitArray', function() {
 
 test('#fromBinaryString', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.buffer[endianness == "LE" ? 2 : 0], 0xf0);
+  assert.equal(b.buffer[0], 0xf0);
   assert.equal(b.buffer[1], 0x38);
-  assert.equal(b.buffer[endianness == "LE" ? 0 : 2], 0x0b);
+  assert.equal(b.buffer[2], 0x0b);
 })
 
 test('#fromBinaryString-toBinaryString', function() {
@@ -95,9 +92,9 @@ test('#fromBinaryString-toBinaryString', function() {
 
 test('#fromHexString', function() {
   var b = (new BitBuffer()).fromHexString("b38f0");
-  assert.equal(b.buffer[endianness == "LE" ? 2 : 0], 0xf0);
+  assert.equal(b.buffer[0], 0xf0);
   assert.equal(b.buffer[1], 0x38);
-  assert.equal(b.buffer[endianness == "LE" ? 0 : 2], 0x0b);
+  assert.equal(b.buffer[2], 0x0b);
 })
 
 test('#fromHexString-toHexString', function() {

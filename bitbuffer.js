@@ -13,30 +13,24 @@ function BitBuffer(number, buffer) {
   this.maxByteIndex = this.buffer.length - 1;
   this.size = number;
   
-  /*
-    If this is a little endian system, byte 0 would be on the left hand side
-    of the buffer. However, since this is supposed to represend a bit array,
-    we should foce a big endian layout by reversing the byte order so byte 0
-    is on the right. 
-  */
-  this._byteIndex = os.endianness() == "LE" ?
-    this._byteIndexLE : this._byteIndexBE; 
+  this._getTypedValue = os.endianness() == "LE" ?
+    this._getTypedValueLE : this._getTypedValueBE;  
 }
 
 
 BitBuffer.prototype = {
 	set: function(index, bool) {
 		if(bool) {
-			this.buffer[this._byteIndex(index)] |= 1 << (index % 8);
+			this.buffer[index >>> 3] |= 1 << (index % 8);
 		} else {
-			this.buffer[this._byteIndex(index)] &= ~(1 << (index % 8));
+			this.buffer[index >>> 3] &= ~(1 << (index % 8));
 		}
 	},
 	get: function(index) {
-    return (this.buffer[this._byteIndex(index)] & (1 << (index % 8))) != 0;
+    return (this.buffer[index >>> 3] & (1 << (index % 8))) != 0;
 	},
 	toggle: function(index) {
-		this.buffer[this._byteIndex(index)] ^= 1 << (index % 8);
+		this.buffer[index >>> 3] ^= 1 << (index % 8);
 	},
 	
   toBuffer: function() {
@@ -144,13 +138,22 @@ BitBuffer.prototype = {
     }
     
     for (var bit_i=bitSize-1, nyb_i=0; nyb_i < nybbleSize; bit_i-=8, nyb_i+=2) {
-      this.buffer[this._byteIndex(bit_i)]=+("0x"+hexstr[nyb_i]+hexstr[nyb_i+1]);
+      this.buffer[bit_i >>> 3]=+("0x"+hexstr[nyb_i]+hexstr[nyb_i+1]);
     }
     
     return this;
   },
   toHexString: function() {
-    var hexstr = this.buffer.toString("hex");
+    var
+      byte_i = this.buffer.length,
+      hexarr = [],
+      hexstr;
+    
+    while (byte_i--) {
+      hexarr.push(this.buffer[byte_i].toString(16));
+    }
+    
+    hexstr = hexarr.join("");
     
     //the string will be in whole bytes.
     //However, if our bit buffer size is not in whole bytes,
@@ -196,7 +199,40 @@ BitBuffer.prototype = {
         this._throwRangeError
       )(bitbuff.buffer, offset);
   },
-  _getTypedValue : {
+  _getTypedValue : null,
+  _getTypedValueLE : {
+    uint: {
+      8: function(bytebuff){
+        return bytebuff.readUInt8();
+      },
+      16: function(bytebuff){
+        return bytebuff.readUInt16LE();
+      },
+      32: function(bytebuff){
+        return bytebuff.readUInt32LE();
+      }
+    },
+    int: {
+      8: function(bytebuff){
+        return bytebuff.readInt8();
+      },
+      16: function(bytebuff){
+        return bytebuff.readInt16LE();
+      },
+      32: function(bytebuff){
+        return bytebuff.readInt32LE();
+      }
+    },
+    float: { 
+      32: function(bytebuff){
+        return bytebuff.readFloatLE();
+      },
+      64: function(bytebuff){
+        return bytebuff.readDoubleLE();
+      }
+    } 
+  },
+  _getTypedValueBE : {
     uint: {
       8: function(bytebuff){
         return bytebuff.readUInt8();
@@ -246,22 +282,13 @@ BitBuffer.prototype = {
       newbuff = new Buffer(newSize);
       newbuff.fill(0);
       
-      //if this is an LE system, we need to make sure the start byte is offset
-      //so the extra size will come in on the left side
-      this.buffer.copy(
-        newbuff, (os.endianness() == "LE" ? newSize - oldSize : 0), 0, oldSize
-      );
+      this.buffer.copy(newbuff, 0, 0, oldSize);
       this.buffer = newbuff;
     
     } else {
       //We are shirinking the buffer, instead of creating a new buffer 
       //and copying, we can just take the slice of the data we need.
-      if (os.endianness() == "LE") {
-        //If this is an LE system we want the higher indexed bytes
-        this.buffer = this.buffer.slice((oldSize - newSize), oldSize);
-      } else {
-        this.buffer = this.buffer.slice(0, newSize);
-      }
+      this.buffer = this.buffer.slice(0, newSize);
     }
 
     //update the size properties
@@ -270,7 +297,7 @@ BitBuffer.prototype = {
 
     if (bitSize % 8 != 0) {
       //zero out any bits beyond the specified size in the last byte
-      lastByte = this._byteIndex(bitSize);
+      lastByte = bitSize >>> 3;
       newbuff[lastByte] = newbuff[lastByte] & (Math.pow(2, bitSize)-1);
     }
     
@@ -331,13 +358,6 @@ BitBuffer.prototype = {
     this.fromBitArray(bitarr);
     
     return this;
-  },
-  _byteIndex: null,
-  _byteIndexLE: function(index) {
-    return this.maxByteIndex - (index >>> 3);
-  },
-  _byteIndexBE: function(index) {
-    return index >>> 3;
   }
 }
 
