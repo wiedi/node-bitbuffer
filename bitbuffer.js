@@ -228,7 +228,9 @@ BitBuffer.prototype = {
       }
     } 
   },
-  _throwRangeError: function(){throw new Error("RangeError");},
+  _throwRangeError: function() {
+    throw new RangeError("Invalid width for requested type");
+  },
   
   resize: function(bitSize) {
     var

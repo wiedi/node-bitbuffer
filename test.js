@@ -222,6 +222,6 @@ test('#getValue-rangeError', function() {
   assert.throws(
     function() {
       var b = (new BitBuffer(0)).getValue(0, 33, "int");
-    }, Error
+    }, RangeError
   )
 })
