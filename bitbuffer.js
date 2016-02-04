@@ -163,7 +163,7 @@ BitBuffer.prototype = {
   },
   
   getValue: function(offset, type, width) {
-    var bitbuff;
+    var propagateSign, bitbuff;
     
     if (this.size == 0) {
       return 0;
@@ -201,7 +201,7 @@ BitBuffer.prototype = {
 
     //make sure the buffer is large enough to read the number
     if (bitbuff.size < width) {
-      bitbuff.resize(width);
+      bitbuff.resize(width, (type == "int"));
     }
     
     return (
@@ -279,27 +279,36 @@ BitBuffer.prototype = {
     throw new RangeError("Invalid width for requested type.");
   },
   
-  resize: function(bitSize) {
+  resize: function(bitSize, propagateSignBit) {
     var
-      oldSize = this.buffer.length,
-      newSize = Math.ceil(bitSize / 8),
-      newbuff, lastByte;
-      
-    if (!isFinite(newSize)) {
+      oldSignBit = this.size - 1,
+      oldByteSize = this.buffer.length,
+      newByteSize = Math.ceil(bitSize / 8),
+      newbuff, lastByte, sign;
+
+    if (!isFinite(newByteSize)) {
       return this;
     }
     
-    if (newSize > oldSize) {
-      newbuff = new Buffer(newSize);
+    if (newByteSize > oldByteSize) {
+      newbuff = new Buffer(newByteSize);
       newbuff.fill(0);
       
-      this.buffer.copy(newbuff, 0, 0, oldSize);
+      this.buffer.copy(newbuff, 0, 0, oldByteSize);
       this.buffer = newbuff;
-    
+
     } else {
       //We are shirinking the buffer, instead of creating a new buffer 
       //and copying, we can just take the slice of the data we need.
-      this.buffer = this.buffer.slice(0, newSize);
+      this.buffer = this.buffer.slice(0, newByteSize);
+    }
+    
+    if (this.size < bitSize) {
+      //since we are growing, we might need to move the sign bit up
+      if (propagateSignBit && this.get(oldSignBit)) {
+        this.set(bitSize - 1, 1);
+        this.set(oldSignBit, 0);
+      }
     }
 
     //update the size properties
