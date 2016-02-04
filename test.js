@@ -102,7 +102,7 @@ test('#fromHexString', function() {
 
 test('#fromHexString-toHexString', function() {
   var b = (new BitBuffer()).fromHexString("b38f0");
-  assert.equal(b.toBinaryString(), "10110011100011110000");
+  assert.equal(b.toHexString(), "b38f0");
 })
 
 test('#fromHexString-toBinaryString-toBitArray-toHexString', function() {
