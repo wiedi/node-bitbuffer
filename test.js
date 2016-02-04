@@ -64,15 +64,6 @@ test('#bigone_4g', function() {
 	big(Math.pow(2,32) - 1)
 })
 
-test('#bigone_8g', function() {
-	assert.throws(
-		function() {
-      var b = new BitBuffer(Math.pow(2,33));
-		},
-		RangeError
-	)
-})
-
 test('#fromBitArray', function() {
   var bitarr = [0,0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,1];
   var b = (new BitBuffer()).fromBitArray(bitarr);
