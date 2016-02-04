@@ -279,11 +279,11 @@ BitBuffer.prototype = {
     throw new RangeError("Invalid width for requested type.");
   },
   
-  resize: function(bitSize, propagateSignBit) {
+  resize: function(newBitSize, propagateSignBit) {
     var
       oldSignBit = this.size - 1,
       oldByteSize = this.buffer.length,
-      newByteSize = Math.ceil(bitSize / 8),
+      newByteSize = Math.ceil(newBitSize / 8),
       newbuff, lastByte, sign;
 
     if (!isFinite(newByteSize)) {
@@ -303,22 +303,22 @@ BitBuffer.prototype = {
       this.buffer = this.buffer.slice(0, newByteSize);
     }
     
-    if (this.size < bitSize) {
+    if (this.size < newBitSize) {
       //since we are growing, we might need to move the sign bit up
       if (propagateSignBit && this.get(oldSignBit)) {
-        this.set(bitSize - 1, 1);
+        this.set(newBitSize - 1, 1);
         this.set(oldSignBit, 0);
       }
     }
 
     //update the size properties
     this.maxByteIndex = this.buffer.length - 1;
-    this.size = bitSize;
+    this.size = newBitSize;
 
-    if (bitSize % 8 != 0) {
+    if (newBitSize % 8 != 0) {
       //zero out any bits beyond the specified size in the last byte
-      lastByte = bitSize >>> 3;
-      newbuff[lastByte] = newbuff[lastByte] & (Math.pow(2, bitSize)-1);
+      lastByte = newBitSize >>> 3;
+      newbuff[lastByte] = newbuff[lastByte] & (Math.pow(2, newBitSize)-1);
     }
     
     return this;
