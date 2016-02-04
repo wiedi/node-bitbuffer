@@ -158,6 +158,78 @@ BitBuffer.prototype = {
     return hexstr.substring(hexstr.length - ((this.size / 4) >> 0));
   },
   
+  toNumber: function() {
+    return +("0x" + this.toHexString());
+  },
+  
+  getValue: function(offset, width, type) {
+    var bitbuff;
+    type = type;
+    offset = +offset;
+    offset = offset > 0 ? offset : 0;
+    width = +width;
+    width = isFinite(width) ? width : (this.size - offset);
+    
+    if (width == 0) {
+      return 0;
+    }
+    
+    //get a copy of this buffer
+    bitbuff = this.subbuffer(offset, offset + width);
+    
+    //if a type is not specified, just convert the new buffer to a number
+    if (!type) {
+      return bitbuff.toNumber();
+    }
+    
+    //convert width to the closest value of 8, 16, 32, 64
+    width = width <= 8 ? 8 : width <=16 ? 16 : width <=32 ? 32 : 64;
+    
+    //make sure the buffer is large enough to read the number
+    if (bitbuff.size < width) {
+      bitbuff.resize(width);
+    }
+    
+    return (
+      (
+        this._getTypedValue[type.toLowerCase()] || {})[width] ||
+        this._throwRangeError
+      )(bitbuff.buffer, offset);
+  },
+  _getTypedValue : {
+    uint: {
+      8: function(bytebuff){
+        return bytebuff.readUInt8();
+      },
+      16: function(bytebuff){
+        return bytebuff.readUInt16BE();
+      },
+      32: function(bytebuff){
+        return bytebuff.readUInt32BE();
+      }
+    },
+    int: {
+      8: function(bytebuff){
+        return bytebuff.readInt8();
+      },
+      16: function(bytebuff){
+        return bytebuff.readInt16BE();
+      },
+      32: function(bytebuff){
+        return bytebuff.readInt32BE();
+      }
+    },
+    float: { 
+      32: function(bytebuff){
+        return bytebuff.readFloatBE();
+      },
+      64: function(bytebuff){
+        return bytebuff.readDoubleBE();
+      }
+    } 
+  },
+  _throwRangeError: function(){throw new Error("RangeError");},
+  
   resize: function(bitSize) {
     var
       oldSize = this.buffer.length,
