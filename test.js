@@ -175,50 +175,65 @@ test('#toNumber', function() {
   assert.equal(b.toNumber(), 0b10110011100011110000);
 })
 
+test('#getValue-typeless-widthless', function() {
+  var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
+  assert.equal(b.getValue(7), 0b1011001110001);
+})
+
 test('#getValue-uint8', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(7, 3, "uint"), 0b00000001);
+  assert.equal(b.getValue(7, "uint", 3), 0b00000001);
 })
 
 test('#getValue-uint16', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, 10, "uint"), 0b0000000011110000);
+  assert.equal(b.getValue(0, "uint", 10), 0b0000000011110000);
 })
 
 test('#getValue-uint32', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, 17, "uint"), 0b00000000000000010011100011110000);
+  assert.equal(b.getValue(0, "uint", 17), 0b00000000000000010011100011110000);
 })
 
 test('#getValue-int8', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(7, 3, "int"), 0b00000001);
+  assert.equal(b.getValue(7,"int", 3), 0b00000001);
 })
 
 test('#getValue-int16', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, 10, "int"), 0b0000000011110000);
+  assert.equal(b.getValue(0, "int", 10), 0b0000000011110000);
 })
 
 test('#getValue-int32', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, 17, "int"), 0b00000000000000010011100011110000);
+  assert.equal(b.getValue(0, "int", 17), 0b00000000000000010011100011110000);
 })
 
 test('#getValue-float32', function() {
   var b = (new BitBuffer()).fromHexString("40400000");
-  assert.equal(b.getValue(0, 32, "float"), 3);
+  assert.equal(b.getValue(0, "float"), 3);
 })
 
 test('#getValue-float64', function() {
   var b = (new BitBuffer()).fromHexString("4008000000000000");
-  assert.equal(b.getValue(0, 64, "float"), 3);
+  assert.equal(b.getValue(0, "float", 64), 3);
+})
+
+test('#getValue-float', function() {
+  var b = (new BitBuffer()).fromHexString("40400000");
+  assert.equal(b.getValue(0, "float"), 3);
+})
+
+test('#getValue-double', function() {
+  var b = (new BitBuffer()).fromHexString("4008000000000000");
+  assert.equal(b.getValue(0, "double"), 3);
 })
 
 test('#getValue-rangeError', function() {
   assert.throws(
     function() {
-      var b = (new BitBuffer(0)).getValue(0, 33, "int");
+      var b = (new BitBuffer(5)).getValue(0, "int", 33);
     }, RangeError
   )
 })

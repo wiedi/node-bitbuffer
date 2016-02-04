@@ -154,10 +154,7 @@ BitBuffer.prototype = {
     }
     
     hexstr = hexarr.join("");
-    
-    //the string will be in whole bytes.
-    //However, if our bit buffer size is not in whole bytes,
-    //we should chop off any leading nybbles before returning
+ 
     return hexstr;
   },
   
@@ -165,29 +162,43 @@ BitBuffer.prototype = {
     return +("0x" + this.toHexString());
   },
   
-  getValue: function(offset, width, type) {
+  getValue: function(offset, type, width) {
     var bitbuff;
-    type = type;
-    offset = +offset;
-    offset = offset > 0 ? offset : 0;
-    width = +width;
-    width = isFinite(width) ? width : (this.size - offset);
     
-    if (width == 0) {
+    if (this.size == 0) {
       return 0;
     }
     
+    type = (type || "").toLowerCase();
+    offset = +offset;
+    offset = offset > 0 ? offset : 0;
+    width = +width;
+
+    //floats and doubles should have a width of either 32 or 64  
+    if (type == "float" && !width) {
+      width = 32;
+    } else if (type == "double") {
+      type = "float";
+      width = 64;
+    }
+    
+    //if width is not specified,
+    //get everything from the offet to the end of the buffer
+    if (!width) {
+      width = this.size - offset;
+    }
+
     //get a copy of this buffer
     bitbuff = this.subbuffer(offset, offset + width);
-    
+
     //if a type is not specified, just convert the new buffer to a number
     if (!type) {
       return bitbuff.toNumber();
     }
     
-    //convert width to the closest value of 8, 16, 32, 64
-    width = width <= 8 ? 8 : width <=16 ? 16 : width <=32 ? 32 : 64;
-    
+    //convert width to the closest value of 8, 16, 32
+    width = width <= 8 ? 8 : width <=16 ? 16 : width <=32 ? 32 : width;
+
     //make sure the buffer is large enough to read the number
     if (bitbuff.size < width) {
       bitbuff.resize(width);
@@ -195,7 +206,7 @@ BitBuffer.prototype = {
     
     return (
       (
-        this._getTypedValue[type.toLowerCase()] || {})[width] ||
+        this._getTypedValue[type] || {})[width] ||
         this._throwRangeError
       )(bitbuff.buffer, offset);
   },
@@ -265,7 +276,7 @@ BitBuffer.prototype = {
     } 
   },
   _throwRangeError: function() {
-    throw new RangeError("Invalid width for requested type");
+    throw new RangeError("Invalid width for requested type.");
   },
   
   resize: function(bitSize) {
