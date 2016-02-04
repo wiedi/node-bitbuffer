@@ -158,7 +158,7 @@ BitBuffer.prototype = {
     //the string will be in whole bytes.
     //However, if our bit buffer size is not in whole bytes,
     //we should chop off any leading nybbles before returning
-    return hexstr.substring(hexstr.length - ((this.size / 4) >> 0));
+    return hexstr;
   },
   
   toNumber: function() {
