@@ -33,6 +33,11 @@ A bit array, backed by node.js Buffer
 	b.get(7) // true
 	console.log(b.toBinaryString()) //"101101111000"
 	
+	//create a sub-buffer of the current buffer
+	b = (new BitBuffer()).fromBinaryString("101100111000");
+	c= b.subbuffer(3, 8)
+	console.log(c.toBinaryString()) //"00111"
+	
 	//create an a boolean array with one bit per element
 	b = (new BitBuffer()).fromBinaryString("101100111000");
 	b.toBitArray();   //[0,0,0,1,1,1,0,0,1,1,0,1] LSB is at array index=0
