@@ -214,64 +214,64 @@ BitBuffer.prototype = {
   _getTypedValueLE : {
     uint: {
       8: function(bytebuff){
-        return bytebuff.readUInt8();
+        return bytebuff.readUInt8(0);
       },
       16: function(bytebuff){
-        return bytebuff.readUInt16LE();
+        return bytebuff.readUInt16LE(0);
       },
       32: function(bytebuff){
-        return bytebuff.readUInt32LE();
+        return bytebuff.readUInt32LE(0);
       }
     },
     int: {
       8: function(bytebuff){
-        return bytebuff.readInt8();
+        return bytebuff.readInt8(0);
       },
       16: function(bytebuff){
-        return bytebuff.readInt16LE();
+        return bytebuff.readInt16LE(0);
       },
       32: function(bytebuff){
-        return bytebuff.readInt32LE();
+        return bytebuff.readInt32LE(0);
       }
     },
     float: { 
       32: function(bytebuff){
-        return bytebuff.readFloatLE();
+        return bytebuff.readFloatLE(0);
       },
       64: function(bytebuff){
-        return bytebuff.readDoubleLE();
+        return bytebuff.readDoubleLE(0);
       }
     } 
   },
   _getTypedValueBE : {
     uint: {
       8: function(bytebuff){
-        return bytebuff.readUInt8();
+        return bytebuff.readUInt8(0);
       },
       16: function(bytebuff){
-        return bytebuff.readUInt16BE();
+        return bytebuff.readUInt16BE(0);
       },
       32: function(bytebuff){
-        return bytebuff.readUInt32BE();
+        return bytebuff.readUInt32BE(0);
       }
     },
     int: {
       8: function(bytebuff){
-        return bytebuff.readInt8();
+        return bytebuff.readInt8(0);
       },
       16: function(bytebuff){
-        return bytebuff.readInt16BE();
+        return bytebuff.readInt16BE(0);
       },
       32: function(bytebuff){
-        return bytebuff.readInt32BE();
+        return bytebuff.readInt32BE(0);
       }
     },
     float: { 
       32: function(bytebuff){
-        return bytebuff.readFloatBE();
+        return bytebuff.readFloatBE(0);
       },
       64: function(bytebuff){
-        return bytebuff.readDoubleBE();
+        return bytebuff.readDoubleBE(0);
       }
     } 
   },

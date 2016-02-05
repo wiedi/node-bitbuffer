@@ -172,42 +172,42 @@ test('#subbuffer-invalid', function() {
 
 test('#toNumber', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.toNumber(), 0b10110011100011110000);
+  assert.equal(b.toNumber(), 735472);//0b10110011100011110000
 })
 
 test('#getValue-typeless-widthless', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(7), 0b1011001110001);
+  assert.equal(b.getValue(7), 5745);//0b1011001110001
 })
 
 test('#getValue-uint8', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(7, "uint", 3), 0b00000001);
+  assert.equal(b.getValue(7, "uint", 3), 1)//0b00000001
 })
 
 test('#getValue-uint16', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, "uint", 10), 0b0000000011110000);
+  assert.equal(b.getValue(0, "uint", 10), 240);//0b0000000011110000;
 })
 
 test('#getValue-uint32', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, "uint", 17), 0b00000000000000010011100011110000);
+  assert.equal(b.getValue(0, "uint", 17), 80112);//0b00000000000000010011100011110000
 })
 
 test('#getValue-int8', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(7,"int", 5), -15);
+  assert.equal(b.getValue(7,"int", 5), -15);//0b11110001
 })
 
 test('#getValue-int16', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, "int", 12), -1808);
+  assert.equal(b.getValue(0, "int", 12), -1808);//0b1111100011110000
 })
 
 test('#getValue-int32', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, "int", 17), -50960);
+  assert.equal(b.getValue(0, "int", 17), -50960);//0b11111111111111110011100011110000
 })
 
 test('#getValue-float32', function() {
