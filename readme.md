@@ -18,6 +18,11 @@ A bit array, backed by node.js Buffer
 	b.toggle(7)
 	b.get(7) // false
     
+	//create a buffer from uint
+	//if using hex format uint, must be a complete number of bytes
+	b = (new BitBuffer()).fromUInt(0xeb90);
+	console.log(b.toHexString()) //"eb90"
+	
 	//create a buffer from a hex string
 	b = (new BitBuffer()).fromHexString("aaa");
 	b.set(8, true)
