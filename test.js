@@ -41,10 +41,8 @@ function big(bit) {
 	b.set(bit, true)
 	assert.equal(b.get(bit), true)
   
-  var byte_i = (bit / 8)|0;
-  
 	assert.equal(
-		(b.buffer[byte_i] & (1 << (bit % 8))) != 0,
+		(b.buffer[(bit / 8)|0] & (1 << (bit % 8))) != 0,
 		true
 	)
 }
