@@ -150,7 +150,6 @@ BitBuffer.prototype = {
       hexstr;
     
     while (byte_i--) {
-      console.log(this.buffer[byte_i].toString(16));
       hexarr.push(
         (this.buffer[byte_i] < 0x10 ? "0" : "") +
         this.buffer[byte_i].toString(16)
@@ -158,8 +157,11 @@ BitBuffer.prototype = {
     }
     
     hexstr = hexarr.join("");
- 
-    return hexstr;
+   
+    //the string will be in whole bytes.
+    //However, if our bit buffer size is not in whole bytes,
+    //we should chop off any leading nybbles before returning
+    return hexstr.substring(hexstr.length - (Math.ceil(this.size / 4)));
   },
   
   toNumber: function() {
