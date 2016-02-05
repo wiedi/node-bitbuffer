@@ -164,6 +164,27 @@ BitBuffer.prototype = {
     return hexstr.substring(hexstr.length - (Math.ceil(this.size / 4)));
   },
   
+  fromUInt: function(num) {
+    var byteSize, bitSize, buff;
+    
+    if (num > Number.MAX_SAFE_INTEGER) {
+      throw RangeError();
+    }
+    
+    bitSize = num < 0x100 ? 8 : num < 0x10000 ? 16 : num < 0x100000000 ? 32 : 64;
+    buff = new BitBuffer(bitSize);
+    
+    byteSize = buff.buffer.length;
+    for(var byte_i = 0, offset = 0; byte_i < byteSize; byte_i++, offset += 8) {
+      buff.buffer[byte_i] = (num >> offset) & 0xff;
+    }
+    
+    this.buffer = buff.buffer;
+    this.size = buff.size;
+    this.maxByteIndex = buff.maxByteIndex;
+    
+    return this
+  },
   toNumber: function() {
     return +("0x" + this.toHexString());
   },
