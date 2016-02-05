@@ -150,7 +150,11 @@ BitBuffer.prototype = {
       hexstr;
     
     while (byte_i--) {
-      hexarr.push(this.buffer[byte_i].toString(16));
+      console.log(this.buffer[byte_i].toString(16));
+      hexarr.push(
+        (this.buffer[byte_i] < 0x10 ? "0" : "") +
+        this.buffer[byte_i].toString(16)
+      );
     }
     
     hexstr = hexarr.join("");
