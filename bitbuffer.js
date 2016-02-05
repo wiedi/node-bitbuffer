@@ -163,7 +163,7 @@ BitBuffer.prototype = {
   },
   
   getValue: function(offset, type, width) {
-    var propagateSign, bitbuff;
+    var bitbuff;
     
     if (this.size == 0) {
       return 0;
