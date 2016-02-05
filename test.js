@@ -197,17 +197,17 @@ test('#getValue-uint32', function() {
 
 test('#getValue-int8', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(7,"int", 5), -127);
+  assert.equal(b.getValue(7,"int", 5), -15);
 })
 
 test('#getValue-int16', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, "int", 12), -32528);
+  assert.equal(b.getValue(0, "int", 12), -1808);
 })
 
 test('#getValue-int32', function() {
   var b = (new BitBuffer()).fromBinaryString("10110011100011110000");
-  assert.equal(b.getValue(0, "int", 17), -2147469072);
+  assert.equal(b.getValue(0, "int", 17), -50960);
 })
 
 test('#getValue-float32', function() {

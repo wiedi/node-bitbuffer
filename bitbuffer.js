@@ -281,14 +281,17 @@ BitBuffer.prototype = {
   
   resize: function(newBitSize, propagateSignBit) {
     var
-      oldSignBit = this.size - 1,
+      oldBitSize = this.size,
       oldByteSize = this.buffer.length,
       newByteSize = Math.ceil(newBitSize / 8),
-      newbuff, lastByte, sign;
+      newbuff, lastByte, bit_i;
 
     if (!isFinite(newByteSize)) {
       return this;
     }
+    
+    //check if both sign propagation flag and sign bit are set
+    propagateSignBit = propagateSignBit & this.get(oldBitSize - 1);
     
     if (newByteSize > oldByteSize) {
       newbuff = new Buffer(newByteSize);
@@ -302,14 +305,6 @@ BitBuffer.prototype = {
       //and copying, we can just take the slice of the data we need.
       this.buffer = this.buffer.slice(0, newByteSize);
     }
-    
-    if (this.size < newBitSize) {
-      //since we are growing, we might need to move the sign bit up
-      if (propagateSignBit && this.get(oldSignBit)) {
-        this.set(newBitSize - 1, 1);
-        this.set(oldSignBit, 0);
-      }
-    }
 
     //update the size properties
     this.maxByteIndex = this.buffer.length - 1;
@@ -321,6 +316,13 @@ BitBuffer.prototype = {
       newbuff[lastByte] = newbuff[lastByte] & (Math.pow(2, newBitSize)-1);
     }
     
+    //flip all of the leading bits if we are propagating sign
+    if (propagateSignBit) {
+      bit_i = oldBitSize;
+      while (bit_i < newBitSize) {
+        this.set(bit_i++, 1);
+      }
+    }
     return this;
   },
   subbuffer: function(begin, end) {
