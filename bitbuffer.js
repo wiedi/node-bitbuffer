@@ -77,6 +77,26 @@ BitBuffer.prototype = {
 		return this
 	},
 	
+	subbuffer: function(begin, end) {
+		var newbuff, size 
+		
+		//make sure begin and end are valid
+		begin = isFinite(+begin) ? begin : 0,
+		end = isFinite(+end) ? +end : this.size
+		begin = begin >= 0 ? begin : 0
+		end = end <= this.size ? end : this.size
+		size = end - begin
+		if (size < 1) {
+			return new BitBuffer(0)
+		}
+		
+		newbuff = new BitBuffer(size)
+		for (var bit_i = 0; bit_i < size; bit_i++) {
+			newbuff.set(bit_i, this.get(bit_i + begin))
+		}
+		return newbuff
+	},
+	
 	fromBitArray: function(bitarr, noresize) {
 		var bitSize = bitarr.length, byteSize = Math.ceil(bitSize / 8)
 
@@ -188,6 +208,119 @@ BitBuffer.prototype = {
 		//However, if our bit buffer size is not in whole bytes,
 		//we should chop off any leading nybbles before returning
 		return hexstr.substring(hexstr.length - (Math.ceil(this.size / 4)))
+	},
+	
+	readUInt8: function(offset, width){
+		return this.read("uint", 8, null, offset, width)
+	},
+	readUInt16BE: function(offset, width){
+		return this.read("uint", 16, "BE", offset, width)
+	},
+	readUInt16LE: function(offset, width){
+		return this.read("uint", 16, "LE", offset, width)
+	},
+	readUInt32BE: function(offset, width){
+		return this.read("uint", 32, "BE", offset, width)
+	},
+	readUInt32LE: function(offset, width){
+		return this.read("uint", 32, "LE", offset, width)
+	},
+	readInt8: function(offset, width){
+		return this.read("int", 8, null, offset, width)
+	},
+	readInt16BE: function(offset, width){
+		return this.read("int", 16, "BE", offset, width)
+	},
+	readInt16LE: function(offset, width){
+		return this.read("int", 16, "LE", offset, width)
+	},
+	readInt32BE: function(offset, width){
+		return this.read("int", 32, "BE", offset, width)
+	},
+	readInt32LE: function(offset, width){
+		return this.read("int", 32, "LE", offset, width)
+	},
+	readFloatBE: function(offset){
+		return this.read("float", 32, "BE", offset)
+	},
+	readFloatLE: function(offset){
+		return this.read("float", 32, "LE", offset)
+	},
+	readDoubleBE: function(offset){
+		return this.read("double", 64, "BE", offset)
+	},
+	readDoubleLE: function(offset){
+		return this.read("double", 64, "LE", offset)
+	},
+	read: function(type, typeWidth, endianness, offset, width) {
+		var buff
+		
+		//validate that input and fill in any blanks we can
+		type = (type + "").toLowerCase()
+		if (type == "float") {
+			typeWidth = 32
+		} else if (type == "double") {
+			typeWidth = 64
+		}
+		if (typeWidth == 8) {
+			endianness = "BE"
+		}
+		if (!typeWidth || !endianness) {
+			//dont really know what to do here...
+			return null
+		}
+		width = !(+width > 0) ? typeWidth : width < typeWidth ? width : typeWidth
+		offset = +offset || 0
+		
+		//create a new buffer which has bit 0 aligned with byte 0
+		buff = this.subbuffer(offset, (offset + width))
+		
+		//if subbuffer didnt give us enough bits, grow with resize
+		if (typeWidth > buff.size) {
+			buff.resize(typeWidth)
+		}
+		
+		return (((this._byteReaders[type] || {})[typeWidth] || {})[endianness] || function(){return null}).call(buff.buffer, 0);
+	},
+	_byteReaders: {
+		"uint": {
+			8: {
+				"BE": Buffer.prototype.readUInt8
+			},
+			16: {
+				"LE": Buffer.prototype.readUInt16LE,
+				"BE": Buffer.prototype.readUInt16BE
+			},
+			32: {
+				"LE": Buffer.prototype.readUInt32LE,
+				"BE": Buffer.prototype.readUInt32BE
+			}
+		},
+		"int": {
+			8: {
+				"BE": Buffer.prototype.readInt8
+			},
+			16: {
+				"LE": Buffer.prototype.readInt16LE,
+				"BE": Buffer.prototype.readInt16BE
+			},
+			32: {
+				"LE": Buffer.prototype.readInt32LE,
+				"BE": Buffer.prototype.readInt32BE
+			}
+		},
+		"float": {
+	  	32: {
+				"LE": Buffer.prototype.readFloatLE,
+				"BE": Buffer.prototype.readFloatBE
+			}
+		},
+		"double": {
+	  	64: {
+				"LE": Buffer.prototype.readDoubleLE,
+				"BE": Buffer.prototype.readDoubleBE
+			}
+		}
 	}
 }
 
