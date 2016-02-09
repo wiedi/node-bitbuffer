@@ -10,6 +10,7 @@ function BitBuffer(number, buffer) {
 		this.buffer.fill(0)
 	}
 	this.size = number
+	this.hostEndianness = require("os").endianness()
 }
 
 BitBuffer.prototype = {
@@ -269,6 +270,31 @@ BitBuffer.prototype = {
 			//dont really know what to do here...
 			return null
 		}
+		
+		
+		/*
+		  If this is running on a little endian system, the underlying Buffer has
+		  been written "backwards" byte indicies.
+			That is to say you did this: 
+				`(new Buffer(2)).write("0001", hex)`
+			you would end up with two bytes of memory that look like this:
+				`[00][01]`
+			However, because of the way BitBuffer fills memory it uses the host to
+			decide where each bit is stored. So if you did this on an LE system:
+				`(new BitBuffer(16)).set(0,1)`
+			the underlying Buffer would have two bytes of memory that look like this:
+				[01][00]
+			
+			So, if you wanted to read out a BE number from memory on a LE system you
+			would actually have to read it as a LE number.
+			
+			Long story short: if this is an LE system, we need to use the opposite reader
+			than what was requested.
+		*/
+		if (this.hostEndianness == "LE") {
+			endianness = endianness == "LE" ? "BE" : "LE"
+		}
+		
 		width = !(+width > 0) ? typeWidth : width < typeWidth ? width : typeWidth
 		offset = +offset || 0
 		
@@ -277,7 +303,7 @@ BitBuffer.prototype = {
 		
 		//if subbuffer didnt give us enough bits, grow with resize
 		if (typeWidth > buff.size) {
-			buff.resize(typeWidth)
+			buff.resize(typeWidth, (type == "int"))
 		}
 		
 		return (((this._byteReaders[type] || {})[typeWidth] || {})[endianness] || function(){return null}).call(buff.buffer, 0);
@@ -285,6 +311,7 @@ BitBuffer.prototype = {
 	_byteReaders: {
 		"uint": {
 			8: {
+				"LE": Buffer.prototype.readUInt8,
 				"BE": Buffer.prototype.readUInt8
 			},
 			16: {
@@ -298,6 +325,7 @@ BitBuffer.prototype = {
 		},
 		"int": {
 			8: {
+				"LE": Buffer.prototype.readInt8,
 				"BE": Buffer.prototype.readInt8
 			},
 			16: {
