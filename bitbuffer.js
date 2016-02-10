@@ -65,7 +65,7 @@ BitBuffer.prototype = {
 		if (newBitSize % 8 != 0) {
 			//zero out any bits beyond the specified size in the last byte
 			lastByte = newBitSize >>> 3
-			newbuff[lastByte] = newbuff[lastByte] & (Math.pow(2, newBitSize)-1)
+			this[lastByte] = this[lastByte] & (Math.pow(2, newBitSize)-1)
 		}
 		
 		//flip all of the leading bits if we are propagating sign
