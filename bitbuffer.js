@@ -355,13 +355,16 @@ BitBuffer.prototype = {
 		width = !(+width > 0) ? typeWidth : width < typeWidth ? width : typeWidth
 		offset = +offset || 0
 		
-		//create a new buffer which has bit 0 aligned with byte 0
-		buff = this.subbuffer(offset, (offset + width))
+		//create new buffer that matches the width we are going to read as a number
+		buff = new BitBuffer(typeWidth)
 		
-		//if subbuffer didnt give us enough bits, grow with resize
-		if (typeWidth > buff.size) {
-			buff.resize(typeWidth, (type == "int"))
+		//when reading less than the full typeWidth of bits, we need to sign extend the ints
+		if (width < typeWidth && type == "int" && this.get(offset + width)) {
+			buff.buffer.fill('f')
 		}
+		
+		//copy all the bits to the new buffer so bit 0 is aligned with byte 0
+		this.copy(buff, 0, offset, offset + width)
 		
 		return (((this._byteReaders[type] || {})[typeWidth] || {})[endianness] || function(){return null}).call(buff.buffer, 0);
 	},
