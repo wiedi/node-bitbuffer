@@ -82,7 +82,7 @@ BitBuffer.prototype = {
 		var newbuff, size 
 		
 		//make sure begin and end are valid
-		begin = isFinite(+begin) ? begin : 0
+		begin = +begin || 0
 		end = isFinite(+end) ? end : this.size
 		begin = begin >= 0 ? begin : 0
 		end = end <= this.size ? end : this.size
@@ -92,10 +92,29 @@ BitBuffer.prototype = {
 		}
 		
 		newbuff = new BitBuffer(size)
-		for (var bit_i = 0; bit_i < size; bit_i++) {
-			newbuff.set(bit_i, this.get(bit_i + begin))
-		}
+		
+		this.copy(newbuff, 0, begin, end)
+		
 		return newbuff
+	},
+	
+	copy: function(destBuff, destStart, srcStart, srcEnd) {
+		destStart = +destStart || 0
+		srcStart = +srcStart || 0
+		srcEnd = isFinite(+srcEnd) ? srcEnd : this.size
+		var length = srcEnd - srcStart
+		
+		if (srcEnd >= this.size) {
+			throw new RangeError("Can not read source BitBuffer beyond end.")
+		} else if (destStart + length >= destBuff.size) {
+			throw new RangeError("Can not write destination BitBuffer beyond end.")
+		}
+		
+		for (var bit_i = 0; bit_i < length; bit_i++) {
+			destBuff.set(srcStart + bit_i, this.get(destStart + bit_i))
+		}
+		
+		return length
 	},
 	
 	fromBitArray: function(bitarr, noresize) {
