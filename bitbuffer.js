@@ -176,7 +176,7 @@ BitBuffer.prototype = {
 		var bitSize = bitstr.length, byteSize = Math.ceil(bitSize / 8), bit_i = 0
 		
 		if (bitSize < 1) {
-			return this.resize(0)
+			return new BitBuffer(0)
 		}
 
 		//clear out the buffer
@@ -206,7 +206,7 @@ BitBuffer.prototype = {
 			bitSize = nybbleSize << 2;
 		
 		if (nybbleSize < 1) {
-			return this.resize(0)
+			return new BitBuffer(0)
 		}
 		
 		//clear out the buffer
