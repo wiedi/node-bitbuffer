@@ -310,7 +310,7 @@ BitBuffer.prototype = {
 	readDoubleLE: function(offset){
 		return this.read("double", 64, "LE", offset)
 	},
-	read: function(type, typeWidth, endianness, offset, width) {
+	read: function(type, typeWidth, endianness, offset, readWidth) {
 		var buff
 		
 		//validate that input and fill in any blanks we can
@@ -352,19 +352,19 @@ BitBuffer.prototype = {
 			endianness = endianness == "LE" ? "BE" : "LE"
 		}
 		
-		width = !(+width > 0) ? typeWidth : width < typeWidth ? width : typeWidth
+		readWidth = !(+readWidth > 0) ? typeWidth : readWidth < typeWidth ? readWidth : typeWidth
 		offset = +offset || 0
 		
 		//create new buffer that matches the width we are going to read as a number
 		buff = new BitBuffer(typeWidth)
 		
 		//when reading less than the full typeWidth of bits, we need to sign extend the ints
-		if (width < typeWidth && type == "int" && this.get(offset + width)) {
+		if (readWidth < typeWidth && type == "int" && this.get(offset + readWidth)) {
 			buff.buffer.fill('f')
 		}
 		
 		//copy all the bits to the new buffer so bit 0 is aligned with byte 0
-		this.copy(buff, 0, offset, offset + width)
+		this.copy(buff, 0, offset, offset + readWidth)
 		
 		return (((this._byteReaders[type] || {})[typeWidth] || {})[endianness] || function(){return null}).call(buff.buffer, 0);
 	},
