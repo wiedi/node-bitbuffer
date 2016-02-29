@@ -299,28 +299,36 @@ BitBuffer.prototype = {
 			So, if you wanted to read out a BE number from memory on a LE system you
 			would actually have to read it as a LE number.
 			
-			Long story short: if this is an LE system, we need to use the opposite reader
-			than what was requested.
+			Long story short: if this is an LE system, we need to use the opposite 
+			reader than what was requested.
 		*/
 		if (this.hostEndianness == "LE") {
 			endianness = endianness == "LE" ? "BE" : "LE"
 		}
 		
-		readWidth = !(+readWidth > 0) ? typeWidth : readWidth < typeWidth ? readWidth : typeWidth
+		readWidth =
+      !(+readWidth > 0) ? typeWidth :
+        readWidth < typeWidth ? readWidth : typeWidth
 		offset = +offset || 0
 		
 		//create new buffer that matches the width we are going to read as a number
 		buff = new BitBuffer(typeWidth)
 		
-		//when reading less than the full typeWidth of bits, we need to sign extend the ints
-		if (readWidth < typeWidth && type == "int" && this.get(offset + readWidth)) {
+		//when reading less than the full typeWidth of bits,
+    //we need to sign extend the ints
+		if (
+      readWidth < typeWidth && type == "int" && this.get(offset + readWidth)
+    ) {
 			buff.buffer.fill(0xff)
 		}
 		
 		//copy all the bits to the new buffer so bit 0 is aligned with byte 0
 		this.copy(buff, 0, offset, offset + readWidth)
 		
-		return (((this._byteReaders[type] || {})[typeWidth] || {})[endianness] || function(){return null}).call(buff.buffer, 0);
+		return (
+      ((this._byteReaders[type] || {})[typeWidth] || {})[endianness] ||
+      function(){return null}
+    ).call(buff.buffer, 0);
 	},
 	_byteReaders: {
 		"uint": {
