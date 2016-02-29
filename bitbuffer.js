@@ -314,7 +314,7 @@ BitBuffer.prototype = {
 		
 		//when reading less than the full typeWidth of bits, we need to sign extend the ints
 		if (readWidth < typeWidth && type == "int" && this.get(offset + readWidth)) {
-			buff.buffer.fill('f')
+			buff.buffer.fill(0xff)
 		}
 		
 		//copy all the bits to the new buffer so bit 0 is aligned with byte 0
