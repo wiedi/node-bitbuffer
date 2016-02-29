@@ -58,14 +58,14 @@ BitBuffer.prototype = {
 		srcEnd = isFinite(+srcEnd) ? srcEnd : this.size
 		var length = srcEnd - srcStart
 		
-		if (srcEnd >= this.size) {
+		if (srcEnd > this.size) {
 			throw new RangeError("Can not read source BitBuffer beyond end.")
-		} else if (destStart + length >= destBuff.size) {
+		} else if (destStart + length > destBuff.size) {
 			throw new RangeError("Can not write destination BitBuffer beyond end.")
 		}
 		
 		for (var bit_i = 0; bit_i < length; bit_i++) {
-			destBuff.set(srcStart + bit_i, this.get(destStart + bit_i))
+			destBuff.set(destStart + bit_i, this.get(srcStart + bit_i))
 		}
 		
 		return length
