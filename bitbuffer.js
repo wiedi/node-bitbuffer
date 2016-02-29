@@ -143,66 +143,10 @@ BitBuffer.prototype = {
 		return this
 	},
 	
-	fromBinaryString: function(bitstr, noresize) {
-		//treat the string as an array of bits that has been indexed backwards
-		var bitSize = bitstr.length, byteSize = Math.ceil(bitSize / 8), bit_i = 0
-		
-		if (bitSize < 1) {
-			return new BitBuffer(0)
-		}
-
-		//clear out the buffer
-		if (noresize || byteSize == this.buffer.length) {
-			this.buffer.fill(0)
-		} else {
-			this.buffer = new Buffer(byteSize)
-			this.buffer.fill(0)
-			this.length = bitSize
-		}
-
-		while (bitSize--) {
-			this.set(bit_i++, !!+bitstr[bitSize])
-		}
-		
-		return this
-	},
 	toBinaryString: function() {
 		return this.toBitArray(-1).join("")
 	},
  
-	fromHexString: function(hexstr, noresize) {
-		//treat the string as an array of bits that has been indexed backwards
-		var
-			nybbleSize = hexstr.length,
-			byteSize = Math.ceil(nybbleSize / 2),
-			bitSize = nybbleSize << 2;
-		
-		if (nybbleSize < 1) {
-			return new BitBuffer(0)
-		}
-		
-		//clear out the buffer
-		if (noresize || byteSize == this.buffer.length) {
-			this.buffer.fill(0)
-		} else {
-			this.buffer = new Buffer(byteSize)
-			this.buffer.fill(0)
-			this.length = bitSize
-		}
-		
-		//pad the hex string if it does not contain an integer number of bytes
-		if (nybbleSize % 2 != 0) {
-			hexstr = "0" + hexstr
-			nybbleSize++
-			bitSize += 4
-		}
-		
-		for (var bit_i=bitSize-1, nyb_i=0; nyb_i < nybbleSize; bit_i-=8, nyb_i+=2) {
-			this.buffer[bit_i >>> 3]=+("0x"+hexstr[nyb_i]+hexstr[nyb_i+1])
-		}
-		
-		return this
-	},
 	toHexString: function() {
 		var byte_i = this.buffer.length, hexarr = [], hexstr
 		
@@ -371,6 +315,64 @@ BitBuffer.prototype = {
 			}
 		}
 	}
+}
+
+BitBuffer.fromBinaryString = function(bitstr, noresize) {
+	//treat the string as an array of bits that has been indexed backwards
+	var bitSize = bitstr.length, byteSize = Math.ceil(bitSize / 8), bit_i = 0
+	
+	if (bitSize < 1) {
+		return new BitBuffer(0)
+	}
+
+	//clear out the buffer
+	if (noresize || byteSize == this.buffer.length) {
+		this.buffer.fill(0)
+	} else {
+		this.buffer = new Buffer(byteSize)
+		this.buffer.fill(0)
+		this.length = bitSize
+	}
+
+	while (bitSize--) {
+		this.set(bit_i++, !!+bitstr[bitSize])
+	}
+	
+	return this
+}
+
+BitBuffer.fromHexString = function(hexstr, noresize) {
+	//treat the string as an array of bits that has been indexed backwards
+	var
+		nybbleSize = hexstr.length,
+		byteSize = Math.ceil(nybbleSize / 2),
+		bitSize = nybbleSize << 2;
+	
+	if (nybbleSize < 1) {
+		return new BitBuffer(0)
+	}
+		
+	//clear out the buffer
+	if (noresize || byteSize == this.buffer.length) {
+		this.buffer.fill(0)
+	} else {
+		this.buffer = new Buffer(byteSize)
+		this.buffer.fill(0)
+		this.length = bitSize
+	}
+	
+	//pad the hex string if it does not contain an integer number of bytes
+	if (nybbleSize % 2 != 0) {
+		hexstr = "0" + hexstr
+		nybbleSize++
+		bitSize += 4
+	}
+	
+	for (var bit_i=bitSize-1, nyb_i=0; nyb_i < nybbleSize; bit_i-=8, nyb_i+=2) {
+		this.buffer[bit_i >>> 3]=+("0x"+hexstr[nyb_i]+hexstr[nyb_i+1])
+	}
+	
+	return this
 }
 
 exports.BitBuffer = BitBuffer
