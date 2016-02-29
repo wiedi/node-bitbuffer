@@ -115,8 +115,7 @@ BitBuffer.prototype = {
 		
 		while (shiftBits--) {
 			//shift the bits off the "front" of the array
-			//array index 0 is at the front, which corresponds to 
-			//LSB on the right of the bit string
+			//array index 0 is at the front
 			bitarr.shift()
 			bitarr.push(0)
 		}
