@@ -9,7 +9,7 @@ function BitBuffer(number, buffer) {
 		this.buffer = new Buffer(size)
 		this.buffer.fill(0)
 	}
-	this.size = number
+	this.length = number
 	this.hostEndianness = require("os").endianness()
 }
 
@@ -37,9 +37,9 @@ BitBuffer.prototype = {
 		
 		//make sure begin and end are valid
 		begin = +begin || 0
-		end = isFinite(+end) ? end : this.size
+		end = isFinite(+end) ? end : this.length
 		begin = begin >= 0 ? begin : 0
-		end = end <= this.size ? end : this.size
+		end = end <= this.length ? end : this.length
 		size = end - begin
 		if (size < 1) {
 			return new BitBuffer(0)
@@ -55,10 +55,10 @@ BitBuffer.prototype = {
 	copy: function(destBuff, destStart, srcStart, srcEnd) {
 		destStart = +destStart || 0
 		srcStart = +srcStart || 0
-		srcEnd = isFinite(+srcEnd) ? srcEnd : this.size
+		srcEnd = isFinite(+srcEnd) ? srcEnd : this.length
 		var length = srcEnd - srcStart
 		
-		if (srcEnd > this.size) {
+		if (srcEnd > this.length) {
 			throw new RangeError("Can not read source BitBuffer beyond end.")
 		} else if (destStart + length > destBuff.size) {
 			throw new RangeError("Can not write destination BitBuffer beyond end.")
@@ -80,7 +80,7 @@ BitBuffer.prototype = {
 		} else {
 			this.buffer = new Buffer(byteSize)
 			this.buffer.fill(0)
-			this.size = bitSize
+			this.length = bitSize
 		}
 		
 		bitarr.forEach(function(bit, bit_i){
@@ -90,7 +90,7 @@ BitBuffer.prototype = {
 		return this
 	},
 	toBitArray: function(bitOrder) {
-		var size = this.size, maxBit = size - 1, bitarr = []
+		var size = this.length, maxBit = size - 1, bitarr = []
 		
 		if (bitOrder < 0) {
 			//bitOrder can be set to a negative number to reverse the bit array
@@ -158,7 +158,7 @@ BitBuffer.prototype = {
 		} else {
 			this.buffer = new Buffer(byteSize)
 			this.buffer.fill(0)
-			this.size = bitSize
+			this.length = bitSize
 		}
 
 		while (bitSize--) {
@@ -188,7 +188,7 @@ BitBuffer.prototype = {
 		} else {
 			this.buffer = new Buffer(byteSize)
 			this.buffer.fill(0)
-			this.size = bitSize
+			this.length = bitSize
 		}
 		
 		//pad the hex string if it does not contain an integer number of bytes
@@ -219,7 +219,7 @@ BitBuffer.prototype = {
 		//the string will be in whole bytes.
 		//However, if our bit buffer size is not in whole bytes,
 		//we should chop off any leading nybbles before returning
-		return hexstr.substring(hexstr.length - (Math.ceil(this.size / 4)))
+		return hexstr.substring(hexstr.length - (Math.ceil(this.length / 4)))
 	},
 	
 	readUInt8: function(offset, width){
