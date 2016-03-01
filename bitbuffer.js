@@ -130,8 +130,12 @@ BitBuffer.prototype = {
 		//make sure begin and end are valid
 		begin = +begin || 0
 		end = isFinite(+end) ? end : this.length
-		begin = begin >= 0 ? begin : 0
-		end = end <= this.length ? end : this.length
+		
+		//negative values are read from the end of the buffer
+		begin = begin >= 0 ? begin : this.length + begin
+		end = end >= 0 ? end : this.length + end
+		
+		//end should come after the begining
 		size = end - begin
 		if (size < 1) {
 			return new BitBuffer(0)
