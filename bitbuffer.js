@@ -82,7 +82,7 @@ BitBuffer.prototype = {
 			this.buffer.fill(0)
 			this.length = bitSize
 		}
-		
+    
 		bitarr.forEach(function(bit, bit_i){
 			this.set(bit_i, bit)
 		}, this)
@@ -317,62 +317,55 @@ BitBuffer.prototype = {
 	}
 }
 
-BitBuffer.fromBinaryString = function(bitstr, noresize) {
-	//treat the string as an array of bits that has been indexed backwards
-	var bitSize = bitstr.length, byteSize = Math.ceil(bitSize / 8), bit_i = 0
-	
+BitBuffer.fromBinaryString = function(bitstr) {
+  var
+    bitSize = bitstr.length,
+    bit_i = 0,
+    buff = new BitBuffer(bitSize);
+  
 	if (bitSize < 1) {
-		return new BitBuffer(0)
+		return buff
 	}
 
-	//clear out the buffer
-	if (noresize || byteSize == this.buffer.length) {
-		this.buffer.fill(0)
-	} else {
-		this.buffer = new Buffer(byteSize)
-		this.buffer.fill(0)
-		this.length = bitSize
-	}
-
+  //treat the string as an array of bits that has been indexed backwards
+  //(bit 0 on the left)
 	while (bitSize--) {
-		this.set(bit_i++, !!+bitstr[bitSize])
+		buff.set(bit_i++, !!+bitstr[bitSize])
 	}
 	
-	return this
+	return buff
 }
 
-BitBuffer.fromHexString = function(hexstr, noresize) {
-	//treat the string as an array of bits that has been indexed backwards
+BitBuffer.fromHexString = function(hexstr) {
 	var
 		nybbleSize = hexstr.length,
-		byteSize = Math.ceil(nybbleSize / 2),
-		bitSize = nybbleSize << 2;
+		bitSize = nybbleSize << 2,
+    buff = new BitBuffer(bitSize),
+    byteVal;
 	
 	if (nybbleSize < 1) {
 		return new BitBuffer(0)
 	}
-		
-	//clear out the buffer
-	if (noresize || byteSize == this.buffer.length) {
-		this.buffer.fill(0)
-	} else {
-		this.buffer = new Buffer(byteSize)
-		this.buffer.fill(0)
-		this.length = bitSize
-	}
-	
-	//pad the hex string if it does not contain an integer number of bytes
+
+	//pad the hex string if it contains an odd number of nybbles
 	if (nybbleSize % 2 != 0) {
 		hexstr = "0" + hexstr
 		nybbleSize++
 		bitSize += 4
 	}
-	
+  
+	//nybble 0 is on the left
 	for (var bit_i=bitSize-1, nyb_i=0; nyb_i < nybbleSize; bit_i-=8, nyb_i+=2) {
-		this.buffer[bit_i >>> 3]=+("0x"+hexstr[nyb_i]+hexstr[nyb_i+1])
+    byteVal = +("0x" + hexstr[nyb_i] + hexstr[nyb_i+1])
+    if (!isFinite(byteVal)) {
+      throw RangeError(
+        hexstr[nyb_i] + hexstr[nyb_i+1] + " is not a valid hex value."
+      )
+    }
+		buff.buffer[bit_i >>> 3] = +(byteVal)
 	}
 	
-	return this
+	return buff
 }
 
 exports.BitBuffer = BitBuffer
