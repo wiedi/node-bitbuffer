@@ -1,15 +1,22 @@
 "use strict"
 
-function BitBuffer(number, buffer) {
-	var size = Math.ceil(number / 8)
+function BitBuffer(bitSize, buffer) {
+	var byteSize = Math.ceil(bitSize / 8)
 	
-	if (buffer != undefined && buffer.length == size) {
+	//if a Buffer is supplied, use it, other wise initialise a new one
+	if (buffer != undefined) {
 		this.buffer = buffer
 	} else {
-		this.buffer = new Buffer(size)
+		this.buffer = new Buffer(byteSize)
 		this.buffer.fill(0)
 	}
-	this.length = number
+	
+	//since the internal Buffer is made of complete bytes, we need to track
+	//how many bits are in the BitBuffer separately
+	this.length = bitSize
+	
+	//reading values requires us to know which order the
+	//internal Buffer's bytes are stored
 	this.hostEndianness = require("os").endianness()
 }
 
