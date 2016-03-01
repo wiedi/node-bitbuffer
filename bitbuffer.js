@@ -14,10 +14,6 @@ function BitBuffer(bitSize, buffer) {
 	//since the internal Buffer is made of complete bytes, we need to track
 	//how many bits are in the BitBuffer separately
 	this.length = bitSize
-	
-	//reading values requires us to know which order the
-	//internal Buffer's bytes are stored
-	this.hostEndianness = require("os").endianness()
 }
 
 BitBuffer.prototype = {
@@ -234,7 +230,7 @@ BitBuffer.prototype = {
 			Long story short: if this is an LE system, we need to use the opposite 
 			reader than what was requested.
 		*/
-		if (this.hostEndianness == "LE") {
+		if (BitBuffer.hostEndianness == "LE") {
 			endianness = endianness == "LE" ? "BE" : "LE"
 		}
 		
@@ -368,5 +364,9 @@ BitBuffer.fromHexString = function(hexstr) {
 	
 	return buff
 }
+
+//reading values requires us to know which order the
+//internal Buffer's bytes are stored
+BitBuffer.hostEndianness = require("os").endianness()
 
 exports.BitBuffer = BitBuffer
