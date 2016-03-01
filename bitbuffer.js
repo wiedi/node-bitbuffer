@@ -71,24 +71,6 @@ BitBuffer.prototype = {
 		return length
 	},
 	
-	fromBitArray: function(bitarr, noresize) {
-		var bitSize = bitarr.length, byteSize = Math.ceil(bitSize / 8)
-
-		//clear out the buffer
-		if (noresize || byteSize == this.buffer.length) {
-			this.buffer.fill(0)
-		} else {
-			this.buffer = new Buffer(byteSize)
-			this.buffer.fill(0)
-			this.length = bitSize
-		}
-    
-		bitarr.forEach(function(bit, bit_i){
-			this.set(bit_i, bit)
-		}, this)
-		
-		return this
-	},
 	toBitArray: function(bitOrder) {
 		var size = this.length, maxBit = size - 1, bitarr = []
 		
@@ -120,7 +102,7 @@ BitBuffer.prototype = {
 			bitarr.push(0)
 		}
 		
-		this.fromBitArray(bitarr)
+		this.buffer = BitBuffer.fromBitArray(bitarr).buffer
 		
 		return this
 	},
@@ -138,7 +120,7 @@ BitBuffer.prototype = {
 			bitarr.pop()
 		}
 		
-		this.fromBitArray(bitarr)
+		this.buffer = BitBuffer.fromBitArray(bitarr).buffer
 		
 		return this
 	},
@@ -317,6 +299,18 @@ BitBuffer.prototype = {
 	}
 }
 
+BitBuffer.fromBitArray = function(bitarr) {
+	var
+		bitSize = bitarr.length,
+		buff = new BitBuffer(bitSize)
+	
+	bitarr.forEach(function(bit, bit_i){
+		buff.set(bit_i, bit)
+	})
+	
+	return buff
+}
+  
 BitBuffer.fromBinaryString = function(bitstr) {
   var
     bitSize = bitstr.length,
