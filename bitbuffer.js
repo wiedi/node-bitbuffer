@@ -1,19 +1,14 @@
 "use strict"
 
-function BitBuffer(bitSize, buffer) {
-	var byteSize = Math.ceil(bitSize / 8)
+function BitBuffer() {
+	var construct =
+		(typeof arguments[0] == "string") ? BitBuffer.fromString :
+		(arguments[0] && arguments[0].length) ? BitBuffer.fromBitArray :
+		BitBuffer.fromSize
 	
-	//if a Buffer is supplied, use it, other wise initialise a new one
-	if (buffer != undefined) {
-		this.buffer = buffer
-	} else {
-		this.buffer = new Buffer(byteSize)
-		this.buffer.fill(0)
-	}
-	
-	//since the internal Buffer is made of complete bytes, we need to track
-	//how many bits are in the BitBuffer separately
-	this.length = bitSize
+	var buff = construct.call(null, arguments[0], arguments[1])
+	this.length = buff.length
+	this.buffer = buff.buffer
 }
 
 BitBuffer.prototype = {
@@ -302,6 +297,27 @@ BitBuffer.prototype = {
 	}
 }
 
+BitBuffer.fromSize = function(bitSize, buffer) {
+	bitSize = +bitSize || 0 //make sure this is a number
+	var
+		byteSize = Math.ceil(bitSize / 8),
+		buff = {}
+	
+	//if a Buffer is supplied, use it, other wise initialise a new one
+	if (buffer != undefined) {
+		buff.buffer = buffer
+	} else {
+		buff.buffer = new Buffer(byteSize)
+		buff.buffer.fill(0)
+	}
+	
+	//since the internal Buffer is made of complete bytes, we need to track
+	//how many bits are in the BitBuffer separately
+	buff.length = bitSize
+	
+	return buff
+}
+
 BitBuffer.fromBitArray = function(bitarr) {
 	var
 		bitSize = bitarr.length,
@@ -313,8 +329,14 @@ BitBuffer.fromBitArray = function(bitarr) {
 	
 	return buff
 }
-  
-BitBuffer.fromBinaryString = function(bitstr) {
+
+BitBuffer.fromString = function(str, enc) {
+	//default to binary if no encoding is specified
+	enc = (enc || "binary").toLowerCase()
+	return BitBuffer["from" + enc + "str"](str) 
+}
+
+BitBuffer.fromBinaryString = BitBuffer.frombinarystr = function(bitstr) {
   var
     bitSize = bitstr.length,
     bit_i = 0,
@@ -333,7 +355,7 @@ BitBuffer.fromBinaryString = function(bitstr) {
 	return buff
 }
 
-BitBuffer.fromHexString = function(hexstr) {
+BitBuffer.fromHexString = BitBuffer.fromhexstr = function(hexstr) {
 	var
 		nybbleSize = hexstr.length,
 		bitSize = nybbleSize << 2,
