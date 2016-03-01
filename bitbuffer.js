@@ -11,6 +11,100 @@ function BitBuffer() {
 	this.buffer = buff.buffer
 }
 
+//reading values requires us to know which order the
+//internal Buffer's bytes are stored
+BitBuffer.hostEndianness = require("os").endianness()
+
+BitBuffer.fromSize = function(bitSize, buffer) {
+	bitSize = +bitSize || 0 //make sure this is a number
+	var
+		byteSize = Math.ceil(bitSize / 8),
+		buff = {}
+	
+	//if a Buffer is supplied, use it, other wise initialise a new one
+	if (buffer != undefined) {
+		buff.buffer = buffer
+	} else {
+		buff.buffer = new Buffer(byteSize)
+		buff.buffer.fill(0)
+	}
+	
+	//since the internal Buffer is made of complete bytes, we need to track
+	//how many bits are in the BitBuffer separately
+	buff.length = bitSize
+	
+	return buff
+}
+
+BitBuffer.fromBitArray = function(bitarr) {
+	var
+		bitSize = bitarr.length,
+		buff = new BitBuffer(bitSize)
+	
+	bitarr.forEach(function(bit, bit_i){
+		buff.set(bit_i, bit)
+	})
+	
+	return buff
+}
+
+BitBuffer.fromString = function(str, enc) {
+	//default to binary if no encoding is specified
+	enc = (enc || "binary").toLowerCase()
+	return BitBuffer["from" + enc + "str"](str) 
+}
+
+BitBuffer.fromBinaryString = BitBuffer.frombinarystr = function(bitstr) {
+	var
+		bitSize = bitstr.length,
+		bit_i = 0,
+		buff = new BitBuffer(bitSize);
+	
+	if (bitSize < 1) {
+		return buff
+	}
+
+	//treat the string as an array of bits that has been indexed backwards
+	//(bit 0 on the left)
+	while (bitSize--) {
+		buff.set(bit_i++, !!+bitstr[bitSize])
+	}
+	
+	return buff
+}
+
+BitBuffer.fromHexString = BitBuffer.fromhexstr = function(hexstr) {
+	var
+		nybbleSize = hexstr.length,
+		bitSize = nybbleSize << 2,
+		buff = new BitBuffer(bitSize),
+		byteVal;
+	
+	if (nybbleSize < 1) {
+		return new BitBuffer(0)
+	}
+
+	//pad the hex string if it contains an odd number of nybbles
+	if (nybbleSize % 2 != 0) {
+		hexstr = "0" + hexstr
+		nybbleSize++
+		bitSize += 4
+	}
+	
+	//nybble 0 is on the left
+	for (var bit_i=bitSize-1, nyb_i=0; nyb_i < nybbleSize; bit_i-=8, nyb_i+=2) {
+		byteVal = +("0x" + hexstr[nyb_i] + hexstr[nyb_i+1])
+		if (!isFinite(byteVal)) {
+			throw RangeError(
+				hexstr[nyb_i] + hexstr[nyb_i+1] + " is not a valid hex value."
+			)
+		}
+		buff.buffer[bit_i >>> 3] = +(byteVal)
+	}
+	
+	return buff
+}
+
 BitBuffer.prototype = {
 	set: function(index, bool) {
 		var pos = index >>> 3
@@ -207,8 +301,8 @@ BitBuffer.prototype = {
 		
 		
 		/*
-		  If this is running on a little endian system, the underlying Buffer has
-		  been written "backwards" byte indicies.
+			If this is running on a little endian system, the underlying Buffer has
+			been written "backwards" byte indicies.
 			That is to say you did this: 
 				`(new Buffer(2)).write("0001", hex)`
 			you would end up with two bytes of memory that look like this:
@@ -230,18 +324,18 @@ BitBuffer.prototype = {
 		}
 		
 		readWidth =
-      !(+readWidth > 0) ? typeWidth :
-        readWidth < typeWidth ? readWidth : typeWidth
+			!(+readWidth > 0) ? typeWidth :
+				readWidth < typeWidth ? readWidth : typeWidth
 		offset = +offset || 0
 		
 		//create new buffer that matches the width we are going to read as a number
 		buff = new BitBuffer(typeWidth)
 		
 		//when reading less than the full typeWidth of bits,
-    //we need to sign extend the ints
+		//we need to sign extend the ints
 		if (
-      readWidth < typeWidth && type == "int" && this.get(offset + readWidth)
-    ) {
+			readWidth < typeWidth && type == "int" && this.get(offset + readWidth)
+		) {
 			buff.buffer.fill(0xff)
 		}
 		
@@ -249,9 +343,9 @@ BitBuffer.prototype = {
 		this.copy(buff, 0, offset, offset + readWidth)
 		
 		return (
-      ((this._byteReaders[type] || {})[typeWidth] || {})[endianness] ||
-      function(){return null}
-    ).call(buff.buffer, 0);
+			((this._byteReaders[type] || {})[typeWidth] || {})[endianness] ||
+			function(){return null}
+		).call(buff.buffer, 0);
 	},
 	_byteReaders: {
 		"uint": {
@@ -283,112 +377,18 @@ BitBuffer.prototype = {
 			}
 		},
 		"float": {
-	  	32: {
+			32: {
 				"LE": Buffer.prototype.readFloatLE,
 				"BE": Buffer.prototype.readFloatBE
 			}
 		},
 		"double": {
-	  	64: {
+			64: {
 				"LE": Buffer.prototype.readDoubleLE,
 				"BE": Buffer.prototype.readDoubleBE
 			}
 		}
 	}
 }
-
-BitBuffer.fromSize = function(bitSize, buffer) {
-	bitSize = +bitSize || 0 //make sure this is a number
-	var
-		byteSize = Math.ceil(bitSize / 8),
-		buff = {}
-	
-	//if a Buffer is supplied, use it, other wise initialise a new one
-	if (buffer != undefined) {
-		buff.buffer = buffer
-	} else {
-		buff.buffer = new Buffer(byteSize)
-		buff.buffer.fill(0)
-	}
-	
-	//since the internal Buffer is made of complete bytes, we need to track
-	//how many bits are in the BitBuffer separately
-	buff.length = bitSize
-	
-	return buff
-}
-
-BitBuffer.fromBitArray = function(bitarr) {
-	var
-		bitSize = bitarr.length,
-		buff = new BitBuffer(bitSize)
-	
-	bitarr.forEach(function(bit, bit_i){
-		buff.set(bit_i, bit)
-	})
-	
-	return buff
-}
-
-BitBuffer.fromString = function(str, enc) {
-	//default to binary if no encoding is specified
-	enc = (enc || "binary").toLowerCase()
-	return BitBuffer["from" + enc + "str"](str) 
-}
-
-BitBuffer.fromBinaryString = BitBuffer.frombinarystr = function(bitstr) {
-  var
-    bitSize = bitstr.length,
-    bit_i = 0,
-    buff = new BitBuffer(bitSize);
-  
-	if (bitSize < 1) {
-		return buff
-	}
-
-  //treat the string as an array of bits that has been indexed backwards
-  //(bit 0 on the left)
-	while (bitSize--) {
-		buff.set(bit_i++, !!+bitstr[bitSize])
-	}
-	
-	return buff
-}
-
-BitBuffer.fromHexString = BitBuffer.fromhexstr = function(hexstr) {
-	var
-		nybbleSize = hexstr.length,
-		bitSize = nybbleSize << 2,
-    buff = new BitBuffer(bitSize),
-    byteVal;
-	
-	if (nybbleSize < 1) {
-		return new BitBuffer(0)
-	}
-
-	//pad the hex string if it contains an odd number of nybbles
-	if (nybbleSize % 2 != 0) {
-		hexstr = "0" + hexstr
-		nybbleSize++
-		bitSize += 4
-	}
-  
-	//nybble 0 is on the left
-	for (var bit_i=bitSize-1, nyb_i=0; nyb_i < nybbleSize; bit_i-=8, nyb_i+=2) {
-    byteVal = +("0x" + hexstr[nyb_i] + hexstr[nyb_i+1])
-    if (!isFinite(byteVal)) {
-      throw RangeError(
-        hexstr[nyb_i] + hexstr[nyb_i+1] + " is not a valid hex value."
-      )
-    }
-		buff.buffer[bit_i >>> 3] = +(byteVal)
-	}
-	
-	return buff
-}
-
-//reading values requires us to know which order the
-//internal Buffer's bytes are stored
-BitBuffer.hostEndianness = require("os").endianness()
 
 exports.BitBuffer = BitBuffer

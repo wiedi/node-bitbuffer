@@ -103,13 +103,13 @@ test('#fromHexString-toHexString', function() {
 test('#fromHexString-toBinaryString-toBitArray-toHexString', function() {
 	var inhexstr = "b38f0";
 	var outhexstr, buff;
-  
-  buff = BitBuffer.fromHexString(inhexstr)
-  buff = BitBuffer.fromBinaryString(buff.toBinaryString())
+	
+	buff = BitBuffer.fromHexString(inhexstr)
+	buff = BitBuffer.fromBinaryString(buff.toBinaryString())
 
-  buff = BitBuffer.fromBitArray(buff.toBitArray())
-  outhexstr = buff.toHexString()
-  
+	buff = BitBuffer.fromBitArray(buff.toBitArray())
+	outhexstr = buff.toHexString()
+	
 	assert.equal(inhexstr, outhexstr);
 })
 
@@ -163,7 +163,7 @@ test('#readUInt32BE', function() {
 
 test('#readInt8', function() {
 	var b = new BitBuffer("10110011100011110000", "binary");
-  assert.equal(b.readInt8(7, 5), -15);//0b11110001
+	assert.equal(b.readInt8(7, 5), -15);//0b11110001
 })
 
 test('#readInt16BE', function() {
