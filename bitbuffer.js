@@ -105,6 +105,30 @@ BitBuffer.fromHexString = BitBuffer.fromhexstr = function(hexstr) {
 	return buff
 }
 
+BitBuffer.codecs = {
+	hex : {
+		fromStr : function (str) {
+			
+		},
+		toStr : function() {
+			
+		}
+	},
+	binary : {
+		fromStr : function (str) {
+			
+		},
+		toStr : function() {
+			
+		}
+	}
+}
+
+BitBuffer.isEncoding = function(enc) {
+	enc = (enc + "").toLowerCase()
+	return typeof BitBuffer.codecs[enc] == "object"
+}
+
 BitBuffer.prototype = {
 	set: function(index, bool) {
 		var pos = index >>> 3
