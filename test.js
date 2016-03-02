@@ -65,6 +65,10 @@ test('#isEncoding-binary', function() {
 test('#isEncoding-hex', function() {
 	assert.ok(BitBuffer.isEncoding("hex"))
 })
+test('#isEncoding-oct', function() {
+	//we dont have oct yet so this should return false
+	assert.ok(!BitBuffer.isEncoding("oct"))
+})
 
 test('#fromBitArray', function() {
 	var bitarr = [0,0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,1];
