@@ -59,6 +59,13 @@ test('#bigone_4g', function() {
 	big(Math.pow(2,32) - 1)
 })
 
+test('#isEncoding-binary', function() {
+	assert.ok(BitBuffer.isEncoding("binary"))
+})
+test('#isEncoding-hex', function() {
+	assert.ok(BitBuffer.isEncoding("hex"))
+})
+
 test('#fromBitArray', function() {
 	var bitarr = [0,0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,1];
 	var b = new BitBuffer(bitarr);
@@ -85,7 +92,7 @@ test('#fromBinaryString', function() {
 
 test('#fromBinaryString-toBinaryString', function() {
 	var b = new BitBuffer("10110011100011110000", "binary");
-	assert.equal(b.toBinaryString(), "10110011100011110000");
+	assert.equal(b.toString("binary"), "10110011100011110000");
 })
 
 test('#fromHexString', function() {
@@ -108,7 +115,7 @@ test('#fromHexString-toBinaryString-toBitArray-toHexString', function() {
 	buff = BitBuffer.fromBinaryString(buff.toBinaryString())
 
 	buff = BitBuffer.fromBitArray(buff.toBitArray())
-	outhexstr = buff.toHexString()
+	outhexstr = buff.toString("hex")
 	
 	assert.equal(inhexstr, outhexstr);
 })
