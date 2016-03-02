@@ -51,7 +51,7 @@ BitBuffer.fromBitArray = function(bitarr) {
 BitBuffer.fromString = function(str, enc) {
 	//default to binary if no encoding is specified
 	enc = (enc || "binary").toLowerCase()
-	return BitBuffer["from" + enc + "str"](str) 
+	return BitBuffer.transcoders[enc].fromString(str) 
 }
 
 BitBuffer.fromBinaryString = function(bitstr) {
@@ -108,26 +108,25 @@ BitBuffer.fromHexString = function(hexstr) {
 //reference all of the to/from string functions
 BitBuffer.transcoders = {
 	hex : {
-		fromStr : function (str) {
-			
+		fromString : function (str) {
+			return BitBuffer.fromHexString(str)
 		},
-		toStr : function() {
-			
+		toString : function(buff) {
+			return buff ? buff.toHexString() : ""
 		}
 	},
 	binary : {
-		fromStr : function (str) {
-			BitBuffer.fromBinaryString
+		fromString : function (str) {
+			return BitBuffer.fromBinaryString(str)
 		},
-		toStr : function() {
-			
+		toString : function(buff) {
+			return buff ? buff.toBinaryString() : ""
 		}
 	}
 }
 
 BitBuffer.isEncoding = function(enc) {
-	enc = (enc + "").toLowerCase()
-	return typeof BitBuffer.transcoders[enc] == "object"
+	return !!BitBuffer.transcoders[(enc + "").toLowerCase()];
 }
 
 BitBuffer.prototype = {
