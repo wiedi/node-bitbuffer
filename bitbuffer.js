@@ -106,7 +106,7 @@ BitBuffer.fromHexString = function(hexstr) {
 }
 
 //reference all of the to/from string functions
-BitBuffer.codecs = {
+BitBuffer.transcoders = {
 	hex : {
 		fromStr : function (str) {
 			
@@ -127,7 +127,7 @@ BitBuffer.codecs = {
 
 BitBuffer.isEncoding = function(enc) {
 	enc = (enc + "").toLowerCase()
-	return typeof BitBuffer.codecs[enc] == "object"
+	return typeof BitBuffer.transcoders[enc] == "object"
 }
 
 BitBuffer.prototype = {
