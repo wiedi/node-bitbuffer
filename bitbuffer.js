@@ -54,7 +54,7 @@ BitBuffer.fromString = function(str, enc) {
 	return BitBuffer["from" + enc + "str"](str) 
 }
 
-BitBuffer.fromBinaryString = BitBuffer.frombinarystr = function(bitstr) {
+BitBuffer.fromBinaryString = function(bitstr) {
 	var
 		bitSize = bitstr.length,
 		bit_i = 0,
@@ -73,7 +73,7 @@ BitBuffer.fromBinaryString = BitBuffer.frombinarystr = function(bitstr) {
 	return buff
 }
 
-BitBuffer.fromHexString = BitBuffer.fromhexstr = function(hexstr) {
+BitBuffer.fromHexString = function(hexstr) {
 	var
 		nybbleSize = hexstr.length,
 		bitSize = nybbleSize << 2,
@@ -105,6 +105,7 @@ BitBuffer.fromHexString = BitBuffer.fromhexstr = function(hexstr) {
 	return buff
 }
 
+//reference all of the to/from string functions
 BitBuffer.codecs = {
 	hex : {
 		fromStr : function (str) {
@@ -116,7 +117,7 @@ BitBuffer.codecs = {
 	},
 	binary : {
 		fromStr : function (str) {
-			
+			BitBuffer.fromBinaryString
 		},
 		toStr : function() {
 			
