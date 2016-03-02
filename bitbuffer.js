@@ -191,23 +191,6 @@ BitBuffer.prototype = {
 		return length
 	},
 	
-	toBitArray: function(bitOrder) {
-		var size = this.length, maxBit = size - 1, bitarr = []
-		
-		if (bitOrder < 0) {
-			//bitOrder can be set to a negative number to reverse the bit array
-			for (var bit_i = 0; bit_i < size; bit_i++) {
-				bitarr[maxBit - bit_i] = +!!this.get(bit_i)
-			}
-		} else {
-			for (var bit_i = 0; bit_i < size; bit_i++) {
-				bitarr[bit_i] = +!!this.get(bit_i)
-			}
-		}
-		
-		return bitarr
-	},
-	
 	shiftRight: function(shiftBits) {
 		if (shiftBits < 0) {
 			return this.shiftLeft(-shiftBits)
@@ -245,10 +228,31 @@ BitBuffer.prototype = {
 		return this
 	},
 	
+	toBitArray: function(bitOrder) {
+		var size = this.length, maxBit = size - 1, bitarr = []
+		
+		if (bitOrder < 0) {
+			//bitOrder can be set to a negative number to reverse the bit array
+			for (var bit_i = 0; bit_i < size; bit_i++) {
+				bitarr[maxBit - bit_i] = +!!this.get(bit_i)
+			}
+		} else {
+			for (var bit_i = 0; bit_i < size; bit_i++) {
+				bitarr[bit_i] = +!!this.get(bit_i)
+			}
+		}
+		
+		return bitarr
+	},
+	
+	toString: function(enc) {
+		//default to binary if no encoding is specified
+	  enc = (enc || "binary").toLowerCase()
+	  return BitBuffer.transcoders[enc].toString(this)
+	},
 	toBinaryString: function() {
 		return this.toBitArray(-1).join("")
 	},
- 
 	toHexString: function() {
 		var byte_i = this.buffer.length, hexarr = [], hexstr
 		
