@@ -254,22 +254,23 @@ BitBuffer.prototype = {
 		return this.toBitArray(-1).join("")
 	},
 	toHexString: function() {
-		var byte_i = this.buffer.length, hexarr = [], hexstr
+		var
+			bits = this.toBitArray(),
+			hexarr = [],
+			byteVal, bit_i;
 		
-		while (byte_i--) {
-			hexarr.push(
-				(this.buffer[byte_i] < 0x10 ? "0" : "") +
-				this.buffer[byte_i].toString(16)
-			)
+		for (bit_i = 0; bit_i < bits.length; bit_i += 4) {
+			byteVal = 0
+			byteVal |= +!!bits[bit_i]
+			byteVal |= +!!bits[bit_i + 1] << 1
+			byteVal |= +!!bits[bit_i + 2] << 2
+			byteVal |= +!!bits[bit_i + 3] << 3
+			hexarr.unshift(byteVal.toString(16))
 		}
 		
-		hexstr = hexarr.join("")
-	 
-		//the string will be in whole bytes.
-		//However, if our bit buffer size is not in whole bytes,
-		//we should chop off any leading nybbles before returning
-		return hexstr.substring(hexstr.length - (Math.ceil(this.length / 4)))
+		return hexarr.join("")
 	},
+
 	
 	readUInt8: function(offset, width){
 		return this.read("uint", 8, null, offset, width)
